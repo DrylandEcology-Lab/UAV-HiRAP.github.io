@@ -17,19 +17,40 @@
 
   <!-- Custom styles for this template -->
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
+  <style>
+    /* 添加自定义样式确保卡片按顺序排列 */
+    .news-grid {
+      display: flex;
+      flex-wrap: wrap;
+      margin-right: -15px;
+      margin-left: -15px;
+    }
+    
+    .news-item {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 992px) {
+      .news-item {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .news-item {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-  <!--header>
-          <div class="navbar navbar-dark bg-dark box-shadow">
-              <div class="container d-flex justify-content-between">
-                  <a href="https://www.uav-hirap.org" class="navbar-brand d-flex align-items-center">
-                      <strong>Home</strong>
-                  </a>
-              </div>
-          </div>
-      </header-->
 
   <main role="main">
 
@@ -51,17 +72,14 @@
     </section>
 
     <div class="album py-5 bg-light">
-
       <div class="container">
-        <div class="card-columns" id="newsContainer">
+        <div class="row news-grid" id="newsContainer">
           <!-- News items will be dynamically inserted here -->
           <!-- 请编辑对应 newsYear.html 文件，不需要修改这个news.html文件 -->
           <!-- 内容会自动加载到newsContainer中，不需要手动添加新闻内容 -->
         </div>
       </div>
-
     </div>
-    </section>
 
   </main>
 
@@ -90,6 +108,10 @@
   <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <script src="static/news_fetch.js"></script>
+  <script>
+    // 如果需要确保加载顺序，可以在news_fetch.js中添加排序逻辑
+    // 或者在加载新闻时按顺序添加到DOM中
+  </script>
 
 </body>
 
