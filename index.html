@@ -207,6 +207,7 @@ header.masthead {
       </div>
     </div>
     <div class="row">
+      <!-- 注释掉的原有团队成员代码（保留不变） -->
       <!--div class="col-md-4">
         <div class="team-member">
           <img class="mx-auto rounded-circle" src="static/about_us/WF.png" alt="">
@@ -237,11 +238,129 @@ header.masthead {
           </a>
         </div>
       </div-->
-      <div class="col-md-12" style="margin-bottom:15px; margin-top:15px;">
-        <div class="text-center" style="background-color:#fed136; top:0px;border:0"><p style="color:white;margin-bottom:0px">   </p></div>
-        <img class="mx-auto" src="static/about_us/2024.png" style="max-width:100%;vertical-align:bottom;">
+
+      <!-- 新增：图片滑动窗口 -->
+      <div class="col-md-12" style="margin: 15px 0; position: relative;">
+        <!-- 滑动指示器（可选，提示用户可滑动） -->
+        <div class="text-center" style="background-color:#fed136; border:0; padding: 2px 0;">
+          <p style="color:white; margin: 0; font-size: 14px;">左右滑动查看图片</p>
+        </div>
+        
+        <!-- 滑动容器：限制可视区域 -->
+        <div class="slide-container" style="
+          width: 100%; 
+          overflow: hidden; /* 隐藏超出可视区域的图片 */
+          position: relative;
+          cursor: grab; /* 鼠标悬浮时显示“可抓取”图标 */
+        ">
+          <!-- 图片轨道：所有图片横向排列 -->
+          <div class="slide-track" style="
+            display: flex; /* 图片横向排列 */
+            transition: transform 0.3s ease; /* 滑动动画（平滑过渡） */
+            will-change: transform; /* 优化动画性能 */
+          ">
+            <!-- 图片1：group2020.jpg -->
+            <img src="static/about_us/2021.png" alt="2021" style="
+              width: 100%; /* 每张图片占满容器宽度 */
+              flex: 0 0 auto; /* 禁止图片缩放 */
+              object-fit: contain; /* 保持图片比例，避免拉伸 */
+              vertical-align: bottom;
+          ">
+            <!-- 图片2：2021.jpg -->
+            <img src="static/about_us/2021.png" alt="2021" style="
+              width: 100%; /* 每张图片占满容器宽度 */
+              flex: 0 0 auto; /* 禁止图片缩放 */
+              object-fit: contain; /* 保持图片比例，避免拉伸 */
+              vertical-align: bottom;
+            ">
+            <!-- 图片3：2022.jpg -->
+            <img src="static/about_us/2022.png" alt="2022" style="
+              width: 100%;
+              flex: 0 0 auto;
+              object-fit: contain;
+              vertical-align: bottom;
+            ">
+            <!-- 图片4：2024.png -->
+            <img src="static/about_us/2024.png" alt="2024" style="
+              width: 100%;
+              flex: 0 0 auto;
+              object-fit: contain;
+              vertical-align: bottom;
+            ">
+          </div>
+        </div>
+
+        <!-- 可选：左右切换按钮（增强易用性，尤其在移动端） -->
+        <button class="slide-btn prev-btn" style="
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: rgba(0,0,0,0.5);
+          color: white;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          font-size: 18px;
+          cursor: pointer;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">←</button>
+        <button class="slide-btn next-btn" style="
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: rgba(0,0,0,0.5);
+          color: white;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          font-size: 18px;
+          cursor: pointer;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">→</button>
+
+        <!-- 可选：图片指示器（显示当前是第几张） -->
+        <div class="slide-indicators" style="
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 10px;
+        ">
+          <span class="indicator active" style="
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #fed136;
+            cursor: pointer;
+          "></span>
+          <span class="indicator" style="
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+          "></span>
+          <span class="indicator" style="
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+          "></span>
+        </div>
       </div>
     </div>
+
+    <!-- 原有实验室介绍文字（保留不变） -->
     <div class="row">
       <div class="col-lg-8 mx-auto text-center">
         <p class="large text-muted">UAV-HiRAP是中国林业科学研究院荒漠化研究所的实验室。
@@ -439,7 +558,120 @@ header.masthead {
 <script src="static/home/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
+<script>
+// 1. 获取DOM元素
+const slideContainer = document.querySelector('.slide-container');
+const slideTrack = document.querySelector('.slide-track');
+const slides = slideTrack.querySelectorAll('img'); // 所有图片
+const prevBtn = document.querySelector('.prev-btn');
+const nextBtn = document.querySelector('.next-btn');
+const indicators = document.querySelectorAll('.indicator');
 
+// 2. 初始化参数
+let currentIndex = 0; // 当前显示的图片索引（0=2021，1=2022，2=2024）
+const slideWidth = slideContainer.offsetWidth; // 每张图片的宽度（等于容器宽度）
+
+// 3. 核心函数：更新滑动位置（根据当前索引）
+function updateSlidePosition() {
+  // 计算轨道需要偏移的距离（负方向=向左滑动）
+  const offset = -currentIndex * slideWidth;
+  slideTrack.style.transform = `translateX(${offset}px)`;
+  
+  // 更新指示器状态（当前图片对应指示器高亮）
+  indicators.forEach((indicator, index) => {
+    if (index === currentIndex) {
+      indicator.style.backgroundColor = '#fed136'; // 高亮色（与页面主题色一致）
+    } else {
+      indicator.style.backgroundColor = '#ccc'; // 默认灰色
+    }
+  });
+}
+
+// 4. 点击“下一张”按钮
+nextBtn.addEventListener('click', () => {
+  // 边界判断：最后一张图点击后回到第一张
+  currentIndex = (currentIndex + 1) % slides.length;
+  updateSlidePosition();
+});
+
+// 5. 点击“上一张”按钮
+prevBtn.addEventListener('click', () => {
+  // 边界判断：第一张图点击后回到最后一张
+  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+  updateSlidePosition();
+});
+
+// 6. 点击指示器切换图片
+indicators.forEach((indicator, index) => {
+  indicator.addEventListener('click', () => {
+    currentIndex = index;
+    updateSlidePosition();
+  });
+});
+
+// 7. 手动拖拽滑动功能（核心交互）
+let isDragging = false; // 是否正在拖拽
+let startX; // 拖拽起始位置的X坐标
+let startScrollLeft; // 拖拽起始时轨道的偏移量
+
+// 拖拽开始：鼠标按下/触摸开始
+slideContainer.addEventListener('mousedown', startDrag);
+slideContainer.addEventListener('touchstart', startDrag, { passive: true }); // passive优化触摸性能
+
+// 拖拽中：鼠标移动/触摸移动
+slideContainer.addEventListener('mousemove', drag);
+slideContainer.addEventListener('touchmove', drag, { passive: true });
+
+// 拖拽结束：鼠标松开/触摸结束
+slideContainer.addEventListener('mouseup', endDrag);
+slideContainer.addEventListener('touchend', endDrag);
+
+// 防止拖拽时选中文字（优化体验）
+slideContainer.addEventListener('selectstart', (e) => e.preventDefault());
+
+// 拖拽开始函数
+function startDrag(e) {
+  isDragging = true;
+  slideContainer.style.cursor = 'grabbing'; // 拖拽时鼠标显示“抓取中”
+  // 获取起始位置（兼容鼠标和触摸）
+  startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+  // 获取轨道当前的偏移量（从transform样式中解析）
+  startScrollLeft = parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) || 0;
+}
+
+// 拖拽中函数
+function drag(e) {
+  if (!isDragging) return; // 未拖拽时不执行
+  e.preventDefault(); // 防止页面滚动
+  // 获取当前位置
+  const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+  // 计算拖拽的距离（当前位置 - 起始位置）
+  const dragDistance = currentX - startX;
+  // 更新轨道位置（起始偏移量 + 拖拽距离）
+  slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
+}
+
+// 拖拽结束函数
+function endDrag() {
+  isDragging = false;
+  slideContainer.style.cursor = 'grab'; // 结束拖拽后恢复鼠标样式
+  // 计算“应该切换到哪张图”：根据轨道偏移量判断
+  const closestIndex = Math.round(-parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) / slideWidth);
+  // 限制索引在有效范围内（0 ~ 图片数量-1）
+  currentIndex = Math.max(0, Math.min(closestIndex, slides.length - 1));
+  // 平滑切换到目标图片
+  updateSlidePosition();
+}
+
+// 窗口大小改变时，重新计算图片宽度（避免响应式问题）
+window.addEventListener('resize', () => {
+  const newSlideWidth = slideContainer.offsetWidth;
+  if (newSlideWidth !== slideWidth) {
+    // 更新宽度后，重新定位当前图片
+    updateSlidePosition();
+  }
+});
+</script>
 </body>
 
 </html>
