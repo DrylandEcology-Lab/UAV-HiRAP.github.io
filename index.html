@@ -173,7 +173,7 @@ header.masthead {
               <li>
               <div class="timeline-image">
                 <!-- the picture is not match with the content-->
-                <img class="rounded-circle img-fluid" src="static/news/20260127.png" alt="publish" style="height:100%!important;">
+                <img class="rounded-circle img-fluid" src="static/news/20260127.jpg" alt="publish" style="height:100%!important;">
               </div>
               <div class="timeline-panel">
                 <div class="timeline-heading">
@@ -207,37 +207,6 @@ header.masthead {
       </div>
     </div>
     <div class="row">
-      <!-- 注释掉的原有团队成员代码（保留不变） -->
-      <!--div class="col-md-4">
-        <div class="team-member">
-          <img class="mx-auto rounded-circle" src="static/about_us/WF.png" alt="">
-          <h4>WANG Feng</h4>
-          <p class="text-muted">Project leader</p>
-          <a class="btn bg-dark text-white" href="about_us.html#WF" target="_blank">
-            View Details
-          </a>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="team-member">
-          <img class="mx-auto rounded-circle" src="static/about_us/WHZ.png" alt="">
-          <h4>WANG Haozhou</h4>
-          <p class="text-muted">Web designer</p>
-          <a class="btn bg-dark text-white" href="about_us.html#WHZ" target="_blank">
-            View Details
-          </a>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="team-member">
-          <img class="mx-auto rounded-circle" src="static/about_us/JJ.png" alt="">
-          <h4>JI Jie</h4>
-          <p class="text-muted">Art designer</p>
-          <a class="btn bg-dark text-white" href="about_us.html#JJ" target="_blank">
-            View Details
-          </a>
-        </div>
-      </div-->
 
       <!-- 新增：图片滑动窗口 -->
       <div class="col-md-12" style="margin: 15px 0; position: relative;">
@@ -259,12 +228,19 @@ header.masthead {
             transition: transform 0.3s ease; /* 滑动动画（平滑过渡） */
             will-change: transform; /* 优化动画性能 */
           ">
+            <!-- 新增2025年照片 -->
+            <img src="static/about_us/2025.png" alt="2025" style="
+              width: 100%; /* 每张图片占满容器宽度 */
+              flex: 0 0 auto; /* 禁止图片缩放 */
+              object-fit: contain; /* 保持图片比例，避免拉伸 */
+              vertical-align: bottom;
+            ">
             <img src="static/about_us/2024.png" alt="2024" style="
               width: 100%; /* 每张图片占满容器宽度 */
               flex: 0 0 auto; /* 禁止图片缩放 */
               object-fit: contain; /* 保持图片比例，避免拉伸 */
               vertical-align: bottom;
-          ">
+            ">
             <img src="static/about_us/2022.jpg" alt="2022" style="
               width: 100%; /* 每张图片占满容器宽度 */
               flex: 0 0 auto; /* 禁止图片缩放 */
@@ -331,6 +307,7 @@ header.masthead {
           gap: 8px;
           margin-top: 10px;
         ">
+          <!-- 新增2025年对应的指示器原点 -->
           <span class="indicator active" style="
             width: 12px;
             height: 12px;
@@ -352,10 +329,139 @@ header.masthead {
             background-color: #ccc;
             cursor: pointer;
           "></span>
+          <span class="indicator" style="
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+          "></span>
+          <span class="indicator" style="
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+          "></span>
         </div>
       </div>
     </div>
 
+    <!-- 把JS代码放在这里（你指定的位置：文本前面、</section>之前） -->
+    <script>
+    // 核心元素获取
+    const slideTrack = document.querySelector('.slide-track');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const indicators = document.querySelectorAll('.indicator');
+    const images = slideTrack.querySelectorAll('img');
+    let currentIndex = 0; // 默认显示第一张（2025年照片）
+
+    // 更新指示器样式
+    function updateIndicators() {
+      indicators.forEach((ind, index) => {
+        if (index === currentIndex) {
+          ind.style.backgroundColor = '#fed136';
+          ind.classList.add('active');
+        } else {
+          ind.style.backgroundColor = '#ccc';
+          ind.classList.remove('active');
+        }
+      });
+    }
+
+    // 切换到指定索引的图片
+    function goToSlide(index) {
+      // 边界处理：循环切换
+      if (index < 0) index = images.length - 1;
+      if (index >= images.length) index = 0;
+      
+      currentIndex = index;
+      // 计算偏移量，实现滑动效果
+      slideTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+      // 更新指示器状态
+      updateIndicators();
+    }
+
+    // 下一张按钮点击事件
+    nextBtn.addEventListener('click', () => {
+      goToSlide(currentIndex + 1);
+    });
+
+    // 上一张按钮点击事件
+    prevBtn.addEventListener('click', () => {
+      goToSlide(currentIndex - 1);
+    });
+
+    // 指示器点击跳转
+    indicators.forEach((ind, index) => {
+      ind.addEventListener('click', () => {
+        goToSlide(index);
+      });
+    });
+
+    // 鼠标拖拽滑动功能
+    let isDragging = false;
+    let startX;
+    let startTransform = 0;
+
+    // 鼠标按下开始拖拽
+    slideTrack.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      // 获取当前的transform偏移值
+      const currentTransform = getComputedStyle(slideTrack).transform;
+      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
+      slideTrack.style.cursor = 'grabbing';
+      slideTrack.style.transition = 'none'; // 暂停过渡，拖拽更流畅
+    });
+
+    // 鼠标移动时拖拽
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const moveX = e.clientX - startX;
+      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
+    });
+
+    // 鼠标松开结束拖拽
+    document.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      slideTrack.style.cursor = 'grab';
+      slideTrack.style.transition = 'transform 0.3s ease'; // 恢复过渡动画
+      
+      // 自动吸附到最近的图片
+      const slideWidth = slideTrack.offsetWidth;
+      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
+      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
+      goToSlide(closestIndex);
+    });
+
+    // 移动端触摸滑动适配
+    slideTrack.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      const currentTransform = getComputedStyle(slideTrack).transform;
+      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
+      slideTrack.style.transition = 'none';
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const moveX = e.touches[0].clientX - startX;
+      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
+    });
+
+    document.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      slideTrack.style.transition = 'transform 0.3s ease';
+      const slideWidth = slideTrack.offsetWidth;
+      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
+      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
+      goToSlide(closestIndex);
+    });
+    </script>
 
     <div class="row">
       <div class="col-lg-8 mx-auto text-center">
