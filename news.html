@@ -12,44 +12,36 @@
   <!-- Bootstrap core CSS -->
   <link href="static/home/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="static/home/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Custom styles for this template -->
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
 
+  <!-- 关键：只去掉强制等高，保留Bootstrap三列布局 -->
   <style>
-.masonry-container {
-  column-count: 3;
-  column-gap: 24px;
-  padding: 0 15px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.card.box-shadow {
-  break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 24px;
-  box-sizing: border-box;
-}
-.card-img-top {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.card-body {
-  width: 100%;
-  box-sizing: border-box;
-}
-@media (max-width: 992px) {
-  .masonry-container {column-count: 2;}
-}
-@media (max-width: 576px) {
-  .masonry-container {column-count: 1;}
-}
+    /* 让row的对齐方式从默认的等高（stretch）改为顶部对齐 */
+    #newsContainer.row {
+      align-items: flex-start;
+    }
+
+    /* 卡片高度自适应，不再强制拉齐 */
+    .card.box-shadow {
+      height: auto;
+    }
+
+    /* 图片宽度自适应，防止撑破 */
+    .card-img-top {
+      width: 100%;
+      height: auto;
+    }
   </style>
 </head>
 
 <body>
+
   <main role="main">
+
     <section class="jumbotron text-center">
       <div class="container">
         <h1 class="jumbotron-heading">实验室新闻</h1>
@@ -69,10 +61,18 @@
     </section>
 
     <div class="album py-5 bg-light">
-      <!-- 移除内层多余container，避免边距挤压 -->
-      <div id="newsContainer" class="masonry-container">
+
+      <div class="container">
+        <!-- 还原row容器 -->
+        <div class="row" id="newsContainer">
+          <!-- News items will be dynamically inserted here -->
+          <!-- 请编辑对应 newsYear.html 文件，不需要修改这个news.html文件 -->
+          <!-- 内容会自动加载到newsContainer中，不需要手动添加新闻内容 -->
+        </div>
       </div>
+
     </div>
+
   </main>
 
   <footer>
@@ -82,7 +82,8 @@
           <span class="copyright">Copyright © CAF-IDS 2018</span>
         </div>
         <div class="col-md-4">
-          <span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a> and <a href="http://flask.pocoo.org/">Python-Flask</a></span>
+          <span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a> and <a
+              href="http://flask.pocoo.org/">Python-Flask</a></span>
         </div>
         <div class="col-md-4">
           <span class="copyright"><a href="#" class="js-scroll-trigger">Back to top</a></span>
@@ -91,9 +92,13 @@
     </div>
   </footer>
 
+  <!-- Bootstrap core JavaScript -->
   <script src="static/home/vendor/jquery/jquery.min.js"></script>
   <script src="static/home/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
+
   <script src="static/news_fetch.js"></script>
+
 </body>
+
 </html>
