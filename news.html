@@ -18,28 +18,33 @@
   <!-- Custom styles for this template -->
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
   <!-- 新增瀑布流样式 -->
-  <style>
-/* 瀑布流容器 */
+    <style>
+/* 重置容器默认的Bootstrap样式 */
 #newsContainer {
+  display: block !important;
+  margin: 0 auto;
+  max-width: 1200px;
   column-count: 3;
-  column-gap: 20px;
+  column-gap: 24px;
 }
 
-/* 卡片整体设置 */
+/* 卡片核心设置：不被截断、宽度自适应 */
 .card.box-shadow {
   break-inside: avoid;
-  margin-bottom: 20px;
   display: inline-block;
   width: 100%;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 关键：限制卡片内的图片宽度 */
+/* 强制图片自适应卡片宽度，防止撑破列 */
 .card-img-top {
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: auto !important;
+  display: block;
 }
 
-/* 响应式适配 */
+/* 响应式适配，小屏幕自动减少列数 */
 @media (max-width: 992px) {
   #newsContainer {
     column-count: 2;
@@ -50,7 +55,7 @@
     column-count: 1;
   }
 }
-  </style>
+    </style>
 </head>
 
 <body>
