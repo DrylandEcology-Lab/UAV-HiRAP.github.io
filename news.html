@@ -19,41 +19,24 @@
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
   <!-- 新增瀑布流样式 -->
     <style>
-/* 重置容器默认的Bootstrap样式 */
-#newsContainer {
-  display: block !important;
-  margin: 0 auto;
-  max-width: 1200px;
-  column-count: 3;
-  column-gap: 24px;
+/* 1. 关掉Bootstrap的强制等高 */
+#newsContainer.row {
+  align-items: flex-start !important;
 }
 
-/* 卡片核心设置：不被截断、宽度自适应 */
+/* 2. 卡片：宽度固定，高度随内容变化 */
+#newsContainer .col-md-4 {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 3. 卡片内部：图片自适应，不撑破宽度 */
 .card.box-shadow {
-  break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  height: auto !important; /* 关键：去掉强制等高 */
 }
-
-/* 强制图片自适应卡片宽度，防止撑破列 */
 .card-img-top {
   width: 100% !important;
   height: auto !important;
-  display: block;
-}
-
-/* 响应式适配，小屏幕自动减少列数 */
-@media (max-width: 992px) {
-  #newsContainer {
-    column-count: 2;
-  }
-}
-@media (max-width: 576px) {
-  #newsContainer {
-    column-count: 1;
-  }
 }
     </style>
 </head>
@@ -93,7 +76,7 @@
     <div class="album py-5 bg-light">
 
       <div class="container">
-        <div class="waterfall-wrap" id="newsContainer">
+        <div class="row align-items-stretch" id="newsContainer">
           <!-- News items will be dynamically inserted here -->
           <!-- 请编辑对应 newsYear.html 文件，不需要修改这个news.html文件 -->
           <!-- 内容会自动加载到newsContainer中，不需要手动添加新闻内容 -->
