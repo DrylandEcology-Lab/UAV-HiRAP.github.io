@@ -12,49 +12,30 @@
   <!-- Bootstrap core CSS -->
   <link href="static/home/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="static/home/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
-  <!-- Custom styles for this template -->
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
-  <!-- 新增瀑布流样式 -->
-    <style>
-/* 1. 关掉Bootstrap的强制等高 */
-#newsContainer.row {
-  align-items: flex-start !important;
-}
 
-/* 2. 卡片：宽度固定，高度随内容变化 */
-#newsContainer .col-md-4 {
-  display: flex;
-  flex-direction: column;
-}
+  <style>
+    /* 1. 让row的对齐方式从默认的等高改为顶部对齐 */
+    #newsContainer {
+      align-items: flex-start;
+    }
 
-/* 3. 卡片内部：图片自适应，不撑破宽度 */
-.card.box-shadow {
-  height: auto !important; /* 关键：去掉强制等高 */
-}
-.card-img-top {
-  width: 100% !important;
-  height: auto !important;
-}
-    </style>
+    /* 2. 卡片：高度随内容变化，不再强制等高 */
+    .card.box-shadow {
+      height: auto !important;
+    }
+
+    /* 3. 图片宽度自适应，不撑破卡片 */
+    .card-img-top {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
 </head>
 
 <body>
-
-  <!--header>
-          <div class="navbar navbar-dark bg-dark box-shadow">
-              <div class="container d-flex justify-content-between">
-                  <a href="https://www.uav-hirap.org" class="navbar-brand d-flex align-items-center">
-                      <strong>Home</strong>
-                  </a>
-              </div>
-          </div>
-      </header-->
-
   <main role="main">
-
     <section class="jumbotron text-center">
       <div class="container">
         <h1 class="jumbotron-heading">实验室新闻</h1>
@@ -74,18 +55,13 @@
     </section>
 
     <div class="album py-5 bg-light">
-
       <div class="container">
-        <div id="newsContainer" class="masonry-container">
+        <!-- 这里必须加row类，删掉masonry-container -->
+        <div id="newsContainer" class="row">
           <!-- News items will be dynamically inserted here -->
-          <!-- 请编辑对应 newsYear.html 文件，不需要修改这个news.html文件 -->
-          <!-- 内容会自动加载到newsContainer中，不需要手动添加新闻内容 -->
         </div>
       </div>
-
     </div>
-    </section>
-
   </main>
 
   <footer>
@@ -95,8 +71,7 @@
           <span class="copyright">Copyright © CAF-IDS 2018</span>
         </div>
         <div class="col-md-4">
-          <span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a> and <a
-              href="http://flask.pocoo.org/">Python-Flask</a></span>
+          <span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a> and <a href="http://flask.pocoo.org/">Python-Flask</a></span>
         </div>
         <div class="col-md-4">
           <span class="copyright"><a href="#" class="js-scroll-trigger">Back to top</a></span>
@@ -105,15 +80,9 @@
     </div>
   </footer>
 
-  <!-- Bootstrap core JavaScript
-        ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
   <script src="static/home/vendor/jquery/jquery.min.js"></script>
   <script src="static/home/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
-
   <script src="static/news_fetch.js"></script>
-
 </body>
-
 </html>
