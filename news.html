@@ -19,24 +19,41 @@
   <link rel="stylesheet" type="text/css" href="static/news/news.css">
   <!-- 新增瀑布流样式 -->
     <style>
-/* 1. 关掉Bootstrap的强制等高 */
-#newsContainer.row {
-  align-items: flex-start !important;
+/* 1. 瀑布流容器核心设置 */
+.masonry-container {
+  column-count: 3;          /* 桌面端3列 */
+  column-gap: 24px;         /* 列之间的间距 */
+  padding: 0 12px;          /* 左右内边距，避免贴边 */
+  max-width: 1200px;        /* 限制最大宽度，居中显示 */
+  margin: 0 auto;           /* 容器居中 */
 }
 
-/* 2. 卡片：宽度固定，高度随内容变化 */
-#newsContainer .col-md-4 {
-  display: flex;
-  flex-direction: column;
-}
-
-/* 3. 卡片内部：图片自适应，不撑破宽度 */
+/* 2. 卡片核心设置：不被列布局截断 */
 .card.box-shadow {
-  height: auto !important; /* 关键：去掉强制等高 */
+  display: inline-block;    /* 关键：卡片在列内正常排列 */
+  width: 100%;              /* 卡片宽度撑满列 */
+  break-inside: avoid;      /* 禁止卡片被列截断 */
+  margin-bottom: 24px;      /* 卡片上下间距 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 保留你原来的阴影 */
 }
+
+/* 3. 强制图片自适应卡片宽度，解决撑破问题 */
 .card-img-top {
   width: 100% !important;
   height: auto !important;
+  display: block;
+}
+
+/* 4. 响应式适配：平板变2列，手机变1列 */
+@media (max-width: 992px) {
+  .masonry-container {
+    column-count: 2;
+  }
+}
+@media (max-width: 576px) {
+  .masonry-container {
+    column-count: 1;
+  }
 }
     </style>
 </head>
@@ -76,7 +93,7 @@
     <div class="album py-5 bg-light">
 
       <div class="container">
-        <div class="row align-items-stretch" id="newsContainer">
+        <div id="newsContainer" class="masonry-container">
           <!-- News items will be dynamically inserted here -->
           <!-- 请编辑对应 newsYear.html 文件，不需要修改这个news.html文件 -->
           <!-- 内容会自动加载到newsContainer中，不需要手动添加新闻内容 -->
