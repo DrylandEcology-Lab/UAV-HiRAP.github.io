@@ -28,6 +28,7 @@ header.masthead {
   gap: 12px;
   padding: 10px;
   width: 100%;
+  box-sizing: border-box; /* 内边距不撑高容器 */
 }
 .grid-item {
   grid-row-end: span var(--row-span);
@@ -240,34 +241,28 @@ header.masthead {
         <!-- 滑动容器：限制可视区域 -->
         <div class="slide-container" style="
           width: 100%; 
-          overflow: hidden; /* 隐藏超出可视区域的图片 */
+          overflow: hidden; /* 隐藏横向溢出，保留纵向滚动 */
           position: relative;
           cursor: grab; /* 鼠标悬浮时显示“可抓取”图标 */
         ">
-          <!-- 图片轨道：所有图片横向排列 -->
+          <!-- 图片轨道：所有内容横向排列 -->
           <div class="slide-track" style="
-            display: flex; /* 图片横向排列 */
+            display: flex; /* 内容横向排列 */
             transition: transform 0.3s ease; /* 滑动动画（平滑过渡） */
             will-change: transform; /* 优化动画性能 */
           ">
-            <!-- 新增2025年照片 -->
-            <!-- 2025 照片 - 自动生成 Grid 瀑布流 -->
+            <!-- 2025 照片 - 自动生成 Grid 瀑布流（支持上下滚动） -->
             <div class="grid-waterfall" id="grid2025" style="
-             width: 100%;
-             flex: 0 0 auto;
-            vertical-align: bottom;
-            ">
-             <!-- 图片会由 JS 自动生成在这里 -->
-            </div>
-            
-
-
-            <!--img src="static/about_us/2025.png" alt="2025" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
+              width: 100%;
+              flex: 0 0 auto;
               vertical-align: bottom;
-            "-->
+              overflow-y: auto; /* 允许纵向滚动 */
+              max-height: 80vh; /* 限制最大高度，超出部分滚动 */
+              -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
+            ">
+              <!-- 图片会由 JS 自动生成在这里 -->
+            </div>
+
             <img src="static/about_us/2024.png" alt="2024" style="
               width: 100%; /* 每张图片占满容器宽度 */
               flex: 0 0 auto; /* 禁止图片缩放 */
@@ -380,122 +375,6 @@ header.masthead {
       </div>
     </div>
 
-    <!-- 把JS代码放在这里（你指定的位置：文本前面、</section>之前） -->
-    <script>
-    // 核心元素获取
-    const slideTrack = document.querySelector('.slide-track');
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const indicators = document.querySelectorAll('.indicator');
-    const images = slideTrack.querySelectorAll('img');
-    let currentIndex = 0; // 默认显示第一张（2025年照片）
-
-    // 更新指示器样式
-    function updateIndicators() {
-      indicators.forEach((ind, index) => {
-        if (index === currentIndex) {
-          ind.style.backgroundColor = '#fed136';
-          ind.classList.add('active');
-        } else {
-          ind.style.backgroundColor = '#ccc';
-          ind.classList.remove('active');
-        }
-      });
-    }
-
-    // 切换到指定索引的图片
-    function goToSlide(index) {
-      // 边界处理：循环切换
-      if (index < 0) index = images.length - 1;
-      if (index >= images.length) index = 0;
-      
-      currentIndex = index;
-      // 计算偏移量，实现滑动效果
-      slideTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-      // 更新指示器状态
-      updateIndicators();
-    }
-
-    // 下一张按钮点击事件
-    nextBtn.addEventListener('click', () => {
-      goToSlide(currentIndex + 1);
-    });
-
-    // 上一张按钮点击事件
-    prevBtn.addEventListener('click', () => {
-      goToSlide(currentIndex - 1);
-    });
-
-    // 指示器点击跳转
-    indicators.forEach((ind, index) => {
-      ind.addEventListener('click', () => {
-        goToSlide(index);
-      });
-    });
-
-    // 鼠标拖拽滑动功能
-    let isDragging = false;
-    let startX;
-    let startTransform = 0;
-
-    // 鼠标按下开始拖拽
-    slideTrack.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      // 获取当前的transform偏移值
-      const currentTransform = getComputedStyle(slideTrack).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
-      slideTrack.style.cursor = 'grabbing';
-      slideTrack.style.transition = 'none'; // 暂停过渡，拖拽更流畅
-    });
-
-    // 鼠标移动时拖拽
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const moveX = e.clientX - startX;
-      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
-    });
-
-    // 鼠标松开结束拖拽
-    document.addEventListener('mouseup', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      slideTrack.style.cursor = 'grab';
-      slideTrack.style.transition = 'transform 0.3s ease'; // 恢复过渡动画
-      
-      // 自动吸附到最近的图片
-      const slideWidth = slideTrack.offsetWidth;
-      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
-      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
-      goToSlide(closestIndex);
-    });
-
-    // 移动端触摸滑动适配
-    slideTrack.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      const currentTransform = getComputedStyle(slideTrack).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
-      slideTrack.style.transition = 'none';
-    });
-
-    document.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const moveX = e.touches[0].clientX - startX;
-      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
-    });
-
-    document.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      slideTrack.style.transition = 'transform 0.3s ease';
-      const slideWidth = slideTrack.offsetWidth;
-      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
-      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
-      goToSlide(closestIndex);
-    });
-    </script>
-
     <div class="row">
       <div class="col-lg-8 mx-auto text-center">
         <p class="large text-muted">UAV-HiRAP是中国林业科学研究院荒漠化研究所的实验室。
@@ -574,7 +453,7 @@ header.masthead {
           <li>王锋*, 卢琦. 2019. 沙地樟子松散生单木的天然更新幼苗空间分布模型. 林业科学, 55(8): 1-8.doi:10.11707/j.1001-7488.20190801.</li>
           <li>姚雪玲, 姜丽娜, 李龙, 王锋, 吴波, 郭秀江. 2019. 浑善达克沙地6种灌木生物量模拟. 生态学报, 39(3)：905-912.doi: 10.5846/stxb201803290637.</li>
           <li>吴隐, 韩东, 姚雪玲, 张静, 王锋*. 2019. 基于无人机高分辨率航空影像的榆树疏林空间分布格局及其地形效应. 热带地理, 39(4)：531-537.doi:10.13284/j.cnki.rddl.003152.</li>
-          <li>Wu R, Cong W, Li Y, Li S, Wang D, Jia Z*, Wang F*. 2019. The Scientific Conceptual Framework for Ecological Quality of the Dryland Ecosystem: Concepts, Indicators, Monitoring and Assessment. Journal of Resources and Ecology, 10(2): 196-201.doi:10.5814/j.issn.1674-764x.2019.02.010.</li> 
+          <li>Wu R, Cong W, Li Y, Li S, Wang D, Jia Z*, Wang F*. 2019. The Scientific Conceptual Framework for Ecological Quality of the Dryland Ecosystem: Concepts, Indicators, Monitoring and Assessment. Journal of Resources and Ecology, 10(2): 196-201.doi:10.5814/j.issn.1674-764x.201902.010.</li> 
           <li>Wang S, Wang J, Zhang L, Xiao Z, Wang F, Sun N, Li D, Chen B, Chen J, Li Y, Wang X, Wang M. 2019. A National Key R&D Program: Technologies and and Guidelines for Monitoring Ecological Quality of terrestrial ecosystems in China. Journal of Resources and Ecology, 10(2): 105-111.doi:10.5814/j.issn.1674-764x.2019.02.001.</li>
        </p><p class="h1">
         <h1 style="font-size:20px">2018 2017</h1>
@@ -711,11 +590,9 @@ header.masthead {
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
 <script>
-// 1. 获取DOM元素
-// ========== 轮播逻辑（修复：识别所有轮播项，不再只取 img） ==========
+// ========== 轮播逻辑（修复版，无冲突） ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
-// 改为获取【直接子元素】，包含 div + img，一共 5 项
 const slides = Array.from(slideTrack.children); 
 const prevBtn = document.querySelector('.prev-btn');
 const nextBtn = document.querySelector('.next-btn');
@@ -733,19 +610,16 @@ function updateSlidePosition() {
   });
 }
 
-// 下一张
 nextBtn.addEventListener('click', () => {
   currentIndex = (currentIndex + 1) % slides.length;
   updateSlidePosition();
 });
 
-// 上一张
 prevBtn.addEventListener('click', () => {
   currentIndex = (currentIndex - 1 + slides.length) % slides.length;
   updateSlidePosition();
 });
 
-// 指示器点击
 indicators.forEach((indicator, index) => {
   indicator.addEventListener('click', () => {
     currentIndex = index;
@@ -753,7 +627,6 @@ indicators.forEach((indicator, index) => {
   });
 });
 
-// 拖拽相关
 let isDragging = false;
 let startX;
 let startScrollLeft;
@@ -791,14 +664,15 @@ function endDrag() {
   updateSlidePosition();
 }
 
-// 窗口缩放重计算
 window.addEventListener('resize', () => {
   updateSlidePosition();
 });
 
-// ========== 2025 瀑布流：延迟执行，确保 DOM 渲染完成 ==========
+// ========== 2025 瀑布流：带高度更新 ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
+  if (!container) return;
+
   const basePath = 'static/about_us/2025/';
   const fileExt = 'jpg';
   const totalImages = 50;
@@ -816,23 +690,33 @@ window.addEventListener('load', function(){
     container.appendChild(item);
   }
 
-  // 图片加载完成后再计算高度
+  // 图片加载完成后计算高度
   const baseRow = 10;
   const allImgs = container.querySelectorAll('.grid-item img');
+  let loadedCount = 0;
+
   allImgs.forEach(img => {
     const calcSpan = () => {
+      if (!img.complete && img.naturalWidth === 0) return;
       const h = img.offsetHeight;
       const span = Math.ceil(h / baseRow);
       img.parentElement.style.setProperty('--row-span', span);
+      
+      loadedCount++;
+      // 所有图片加载完成后，更新轮播容器高度
+      if (loadedCount === allImgs.length) {
+        slideContainer.style.height = `${container.scrollHeight}px`;
+      }
     };
-    if (img.complete) {
+
+    if (img.complete && img.naturalWidth > 0) {
       calcSpan();
     } else {
       img.onload = calcSpan;
+      img.onerror = () => console.error('图片加载失败:', img.src);
     }
   });
 });
 </script>
 </body>
-
 </html>
