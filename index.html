@@ -712,48 +712,40 @@ header.masthead {
 <script src="static/home/home.js"></script>
 <script>
 // 1. 获取DOM元素
+// ========== 轮播逻辑（修复：识别所有轮播项，不再只取 img） ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
-const slides = slideTrack.querySelectorAll('img'); // 所有图片
+// 改为获取【直接子元素】，包含 div + img，一共 5 项
+const slides = Array.from(slideTrack.children); 
 const prevBtn = document.querySelector('.prev-btn');
 const nextBtn = document.querySelector('.next-btn');
 const indicators = document.querySelectorAll('.indicator');
 
-// 2. 初始化参数
-let currentIndex = 0; // 当前显示的图片索引（0=2021，1=2022，2=2024）
-const slideWidth = slideContainer.offsetWidth; // 每张图片的宽度（等于容器宽度）
+let currentIndex = 0;
+const slideWidth = slideContainer.offsetWidth;
 
-// 3. 核心函数：更新滑动位置（根据当前索引）
 function updateSlidePosition() {
-  // 计算轨道需要偏移的距离（负方向=向左滑动）
   const offset = -currentIndex * slideWidth;
   slideTrack.style.transform = `translateX(${offset}px)`;
-  
-  // 更新指示器状态（当前图片对应指示器高亮）
+
   indicators.forEach((indicator, index) => {
-    if (index === currentIndex) {
-      indicator.style.backgroundColor = '#fed136'; // 高亮色（与页面主题色一致）
-    } else {
-      indicator.style.backgroundColor = '#ccc'; // 默认灰色
-    }
+    indicator.style.backgroundColor = index === currentIndex ? '#fed136' : '#ccc';
   });
 }
 
-// 4. 点击“下一张”按钮
+// 下一张
 nextBtn.addEventListener('click', () => {
-  // 边界判断：最后一张图点击后回到第一张
   currentIndex = (currentIndex + 1) % slides.length;
   updateSlidePosition();
 });
 
-// 5. 点击“上一张”按钮
+// 上一张
 prevBtn.addEventListener('click', () => {
-  // 边界判断：第一张图点击后回到最后一张
   currentIndex = (currentIndex - 1 + slides.length) % slides.length;
   updateSlidePosition();
 });
 
-// 6. 点击指示器切换图片
+// 指示器点击
 indicators.forEach((indicator, index) => {
   indicator.addEventListener('click', () => {
     currentIndex = index;
@@ -761,101 +753,84 @@ indicators.forEach((indicator, index) => {
   });
 });
 
-// 7. 手动拖拽滑动功能（核心交互）
-let isDragging = false; // 是否正在拖拽
-let startX; // 拖拽起始位置的X坐标
-let startScrollLeft; // 拖拽起始时轨道的偏移量
+// 拖拽相关
+let isDragging = false;
+let startX;
+let startScrollLeft;
 
-// 拖拽开始：鼠标按下/触摸开始
 slideContainer.addEventListener('mousedown', startDrag);
-slideContainer.addEventListener('touchstart', startDrag, { passive: true }); // passive优化触摸性能
-
-// 拖拽中：鼠标移动/触摸移动
+slideContainer.addEventListener('touchstart', startDrag, { passive: true });
 slideContainer.addEventListener('mousemove', drag);
 slideContainer.addEventListener('touchmove', drag, { passive: true });
-
-// 拖拽结束：鼠标松开/触摸结束
 slideContainer.addEventListener('mouseup', endDrag);
 slideContainer.addEventListener('touchend', endDrag);
+slideContainer.addEventListener('selectstart', e => e.preventDefault());
 
-// 防止拖拽时选中文字（优化体验）
-slideContainer.addEventListener('selectstart', (e) => e.preventDefault());
-
-// 拖拽开始函数
 function startDrag(e) {
   isDragging = true;
-  slideContainer.style.cursor = 'grabbing'; // 拖拽时鼠标显示“抓取中”
-  // 获取起始位置（兼容鼠标和触摸）
+  slideContainer.style.cursor = 'grabbing';
   startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-  // 获取轨道当前的偏移量（从transform样式中解析）
-  startScrollLeft = parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) || 0;
+  startScrollLeft = parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)?.[0]) || 0;
 }
 
-// 拖拽中函数
 function drag(e) {
-  if (!isDragging) return; // 未拖拽时不执行
-  e.preventDefault(); // 防止页面滚动
-  // 获取当前位置
+  if (!isDragging) return;
+  e.preventDefault();
   const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-  // 计算拖拽的距离（当前位置 - 起始位置）
   const dragDistance = currentX - startX;
-  // 更新轨道位置（起始偏移量 + 拖拽距离）
   slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
 }
 
-// 拖拽结束函数
 function endDrag() {
   isDragging = false;
-  slideContainer.style.cursor = 'grab'; // 结束拖拽后恢复鼠标样式
-  // 计算“应该切换到哪张图”：根据轨道偏移量判断
-  const closestIndex = Math.round(-parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) / slideWidth);
-  // 限制索引在有效范围内（0 ~ 图片数量-1）
+  slideContainer.style.cursor = 'grab';
+  const transformVal = getComputedStyle(slideTrack).transform;
+  const offset = parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0;
+  const closestIndex = Math.round(-offset / slideWidth);
   currentIndex = Math.max(0, Math.min(closestIndex, slides.length - 1));
-  // 平滑切换到目标图片
   updateSlidePosition();
 }
 
-// 窗口大小改变时，重新计算图片宽度（避免响应式问题）
+// 窗口缩放重计算
 window.addEventListener('resize', () => {
-  const newSlideWidth = slideContainer.offsetWidth;
-  if (newSlideWidth !== slideWidth) {
-    // 更新宽度后，重新定位当前图片
-    updateSlidePosition();
-  }
+  updateSlidePosition();
 });
-// 2025 照片瀑布流 - 自动生成图片标签
-(function () {
+
+// ========== 2025 瀑布流：延迟执行，确保 DOM 渲染完成 ==========
+window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
   const basePath = 'static/about_us/2025/';
-  const fileExt = 'jpg'; // 如果你的图片是png，改成 'png'
-  const totalImages = 50; // 你的照片总数
+  const fileExt = 'jpg';
+  const totalImages = 50;
 
-  // 循环生成所有图片
+  // 批量生成图片
   for (let i = 1; i <= totalImages; i++) {
     const item = document.createElement('div');
     item.className = 'grid-item';
 
     const img = document.createElement('img');
-    img.src = basePath + `img${i}.${fileExt}`;
+    img.src = `${basePath}img${i}.${fileExt}`;
     img.alt = `2025-${i}`;
 
     item.appendChild(img);
     container.appendChild(item);
   }
-})();
-// Grid 瀑布流 自动计算跨行
-const baseRow = 10; // 和 CSS 里 grid-auto-rows:10px 保持一致
-document.querySelectorAll('.grid-item img').forEach(img => {
-  function setSpan() {
-    const h = img.offsetHeight;
-    const span = Math.ceil(h / baseRow);
-    img.parentElement.style.setProperty('--row-span', span);
-  }
-  if (img.complete) {
-    setSpan();
-  } else {
-    img.onload = setSpan;
-  }
+
+  // 图片加载完成后再计算高度
+  const baseRow = 10;
+  const allImgs = container.querySelectorAll('.grid-item img');
+  allImgs.forEach(img => {
+    const calcSpan = () => {
+      const h = img.offsetHeight;
+      const span = Math.ceil(h / baseRow);
+      img.parentElement.style.setProperty('--row-span', span);
+    };
+    if (img.complete) {
+      calcSpan();
+    } else {
+      img.onload = calcSpan;
+    }
+  });
 });
 </script>
 </body>
