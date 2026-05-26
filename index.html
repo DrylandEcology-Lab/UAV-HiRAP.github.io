@@ -21,38 +21,32 @@ header.masthead {
 
 /* ========== 5列自适应网格，最小宽度220px，保证图片不太小 ========== */
 .grid-masonry {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
-  gap: 16px;
+  column-count: 5;
+  column-gap: 16px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px;
-  height: auto;
-  overflow: visible;
-  -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
-/* 响应式：屏幕小于1200px时改为4列，小于992px时3列，小于768px时2列，小于480px时1列 */
+
 @media (max-width: 1200px) {
-  .grid-masonry {
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-  }
+  .grid-masonry { column-count: 4; }
 }
 @media (max-width: 992px) {
-  .grid-masonry {
-    grid-template-columns: repeat(3, minmax(180px, 1fr));
-  }
+  .grid-masonry { column-count: 3; }
 }
 @media (max-width: 768px) {
-  .grid-masonry {
-    grid-template-columns: repeat(2, minmax(160px, 1fr));
-  }
+  .grid-masonry { column-count: 2; }
 }
 @media (max-width: 480px) {
-  .grid-masonry {
-    grid-template-columns: 1fr;
-  }
+  .grid-masonry { column-count: 1; }
 }
 
 .grid-masonry .grid-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
@@ -60,14 +54,15 @@ header.masthead {
   transition: transform 0.2s ease;
   line-height: 0;
 }
+
 .grid-masonry .grid-item:hover {
   transform: scale(1.02);
 }
+
 .grid-masonry .grid-item img {
   width: 100%;
   height: auto;
   display: block;
-  vertical-align: bottom;
 }
 
 /* 固定轮播按钮位置 */
@@ -217,10 +212,10 @@ header.masthead {
           <p style="color:white; margin: 0; font-size: 14px;">← 左右滑动切换年份 → &nbsp;&nbsp;|&nbsp;&nbsp; ↑ 在照片区域上下滑动滚动浏览 ↑</p>
         </div>
         
-        <div class="slide-container" style="width:100%; height:auto; overflow:hidden; position:relative; cursor:grab;">
+        <div class="slide-container" style="width:100%; height:600px; overflow:hidden; position:relative; cursor:grab;">
           <div class="slide-track" style="display:flex; transition:transform 0.3s ease; will-change:transform; height:100%;">
             <!-- 2025 照片容器 -->
-            <div id="grid2025" style="width:100%; flex:0 0 auto; height:auto;"></div>
+            <div id="grid2025" style="width:100%; flex:0 0 auto; height:100%;"></div>
             <img src="static/about_us/2024.png" alt="2024" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
             <img src="static/about_us/2022.jpg" alt="2022" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
             <img src="static/about_us/2021.jpg" alt="2021" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
@@ -500,7 +495,9 @@ function startDrag(e) {
 
 function drag(e) {
   if (!isDragging) return;
+
   let currentX, currentY;
+
   if (e.type === 'mousemove') {
     currentX = e.clientX;
     currentY = e.clientY;
@@ -508,14 +505,18 @@ function drag(e) {
     currentX = e.touches[0].clientX;
     currentY = e.touches[0].clientY;
   }
+
   const deltaX = Math.abs(currentX - startX);
   const deltaY = Math.abs(currentY - startY);
-  if (deltaY > deltaX) {
-    return; // 垂直滚动优先
+
+  if (e.target.closest('.grid-masonry') && deltaY > deltaX) {
+    return;
   }
-  if (deltaX > 5) {
+
+  if (deltaX > deltaY && deltaX > 8) {
     isHorizontalDrag = true;
     e.preventDefault();
+
     const dragDistance = currentX - startX;
     slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
   }
