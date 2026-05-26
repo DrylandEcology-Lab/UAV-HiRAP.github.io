@@ -19,19 +19,18 @@ header.masthead {
     background-image: url("static/home/index.jpg");
 }
 
-/* ========== 2025 图片 Grid 瀑布流样式 ========== */
+/* ========== 无空白瀑布流样式 ========== */
 .grid-waterfall {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 缩小列宽，更紧凑 */
-  grid-auto-rows: 5px; /* 减小基础行高，减少空白 */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-auto-rows: auto; /* 关键：让行高自动适配图片高度 */
   grid-auto-flow: dense;
-  gap: 6px; /* 缩小图片间距 */
-  padding: 6px; /* 缩小内边距 */
+  gap: 6px; /* 图片间距，可根据需要调整 */
+  padding: 6px;
   width: 100%;
   box-sizing: border-box;
 }
 .grid-item {
-  grid-row-end: span var(--row-span);
   border-radius: 4px;
   overflow: hidden;
   background: #fff;
@@ -40,8 +39,9 @@ header.masthead {
   width: 100%;
   height: auto;
   display: block;
+  vertical-align: bottom; /* 消除图片底部默认空白 */
 }
-/* 固定轮播按钮位置，不受容器高度影响 */
+/* 固定轮播按钮位置 */
 .slide-btn {
   position: absolute;
   top: 50% !important;
@@ -247,10 +247,10 @@ header.masthead {
           <p style="color:white; margin: 0; font-size: 14px;">左右滑动查看图片</p>
         </div>
         
-        <!-- 滑动容器：固定高度，不随瀑布流变化 -->
+        <!-- 滑动容器：固定高度 -->
         <div class="slide-container" style="
           width: 100%; 
-          height: 600px; /* 固定轮播容器高度，避免按钮被撑远 */
+          height: 600px;
           overflow: hidden;
           position: relative;
           cursor: grab;
@@ -260,14 +260,14 @@ header.masthead {
             display: flex;
             transition: transform 0.3s ease;
             will-change: transform;
-            height: 100%; /* 让轨道高度等于容器高度 */
+            height: 100%;
           ">
-            <!-- 2025 照片 - 瀑布流（固定高度+滚动） -->
+            <!-- 2025 照片 - 无空白瀑布流 -->
             <div class="grid-waterfall" id="grid2025" style="
               width: 100%;
               flex: 0 0 auto;
               overflow-y: auto;
-              height: 100%; /* 瀑布流占满容器高度，内部滚动 */
+              height: 100%;
               -webkit-overflow-scrolling: touch;
             ">
               <!-- 图片会由 JS 自动生成在这里 -->
@@ -499,8 +499,8 @@ header.masthead {
           <li>李晓雅. 从分布格局到单木结构:中国东部温带稀树草原的结构特征研究. 第十六届中国林业青年学术年会. 中国武汉. 2024年11月15日-17日.</li>
           <li>蔡依霏. 中国“三北”地区荒漠化潜在地理分布研究. 第十六届中国林业青年学术年会. 中国武汉. 2024年11月15日-17日.</li>
           <li>王锋. 中国东部沙地温带稀树草原：定位监测、区域分布及经验启示.  内蒙古自治区林业科学研究院举办建院70周年暨三北地区生态保护与防沙治沙学术研讨会. 中国呼和浩特. 2024年11月8日-10日.</li>
-          <li>王锋. 科尔沁、浑善达克沙地稀树草原分布与成因研究. 第二十三届生态学大会. 中国沈阳. 2024年10月25日-27日.</li>
-          <li>夏双双. 基于无人机遥感的榆树疏林草原十年植被覆盖时空动态. 第二十三届生态学大会. 中国沈阳. 2024年10月25日-27日.</li>
+          <li>王锋. 科尔沁、浑善达克沙地稀树草原分布与成因研究. 第二十三届生态学大会. 中国沈阳. 2024年10月25-27日.</li>
+          <li>夏双双. 基于无人机遥感的榆树疏林草原十年植被覆盖时空动态. 第二十三届生态学大会. 中国沈阳. 2024年10月25-27日.</li>
           <li>王锋. 黄河流域水资源承载力下林草资源优化配置研究. 第五届国际三角洲论坛暨第二届黄河国际人才周活动. 中国东营. 2024年9月25-27日.</li>
           <li>王锋. 破解中国东部沙地温带稀树草原的分布与成因. 第九届青年地学论坛.中国厦门. 2024年5月18-20日.</li>
           <li>李晓雅. 基于深度学习算法和高分卫星的中国东部沙地温带稀树草原单木识别研究. 第九届青年地学论坛. 中国厦门. 2024年5月18-20日.</li>
@@ -599,7 +599,7 @@ header.masthead {
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
 <script>
-// ========== 轮播逻辑（修复版，无冲突） ==========
+// ========== 轮播逻辑 ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
 const slides = Array.from(slideTrack.children); 
@@ -677,7 +677,7 @@ window.addEventListener('resize', () => {
   updateSlidePosition();
 });
 
-// ========== 2025 瀑布流：优化高度计算，消除空白 ==========
+// ========== 2025 瀑布流（无空白版本） ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
   if (!container) return;
@@ -686,7 +686,7 @@ window.addEventListener('load', function(){
   const fileExt = 'jpg';
   const totalImages = 50;
 
-  // 批量生成图片
+  // 批量生成图片，无需跨距计算
   for (let i = 1; i <= totalImages; i++) {
     const item = document.createElement('div');
     item.className = 'grid-item';
@@ -698,26 +698,6 @@ window.addEventListener('load', function(){
     item.appendChild(img);
     container.appendChild(item);
   }
-
-  // 优化图片高度计算，减少空白
-  const baseRow = 5;
-  const allImgs = container.querySelectorAll('.grid-item img');
-
-  allImgs.forEach(img => {
-    const calcSpan = () => {
-      if (!img.complete && img.naturalWidth === 0) return;
-      const h = img.offsetHeight;
-      const span = Math.ceil(h / baseRow);
-      img.parentElement.style.setProperty('--row-span', span);
-    };
-
-    if (img.complete && img.naturalWidth > 0) {
-      calcSpan();
-    } else {
-      img.onload = calcSpan;
-      img.onerror = () => console.error('图片加载失败:', img.src);
-    }
-  });
 });
 </script>
 </body>
