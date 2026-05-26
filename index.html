@@ -22,17 +22,17 @@ header.masthead {
 /* ========== 2025 图片 Grid 瀑布流样式 ========== */
 .grid-waterfall {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  grid-auto-rows: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 缩小列宽，更紧凑 */
+  grid-auto-rows: 5px; /* 减小基础行高，减少空白 */
   grid-auto-flow: dense;
-  gap: 12px;
-  padding: 10px;
+  gap: 6px; /* 缩小图片间距 */
+  padding: 6px; /* 缩小内边距 */
   width: 100%;
-  box-sizing: border-box; /* 内边距不撑高容器 */
+  box-sizing: border-box;
 }
 .grid-item {
   grid-row-end: span var(--row-span);
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
   background: #fff;
 }
@@ -41,6 +41,15 @@ header.masthead {
   height: auto;
   display: block;
 }
+/* 固定轮播按钮位置，不受容器高度影响 */
+.slide-btn {
+  position: absolute;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10;
+}
+.prev-btn { left: 10px !important; }
+.next-btn { right: 10px !important; }
 </style>
 </head>
 
@@ -238,59 +247,60 @@ header.masthead {
           <p style="color:white; margin: 0; font-size: 14px;">左右滑动查看图片</p>
         </div>
         
-        <!-- 滑动容器：限制可视区域 -->
+        <!-- 滑动容器：固定高度，不随瀑布流变化 -->
         <div class="slide-container" style="
           width: 100%; 
-          overflow: hidden; /* 隐藏横向溢出，保留纵向滚动 */
+          height: 600px; /* 固定轮播容器高度，避免按钮被撑远 */
+          overflow: hidden;
           position: relative;
-          cursor: grab; /* 鼠标悬浮时显示“可抓取”图标 */
+          cursor: grab;
         ">
           <!-- 图片轨道：所有内容横向排列 -->
           <div class="slide-track" style="
-            display: flex; /* 内容横向排列 */
-            transition: transform 0.3s ease; /* 滑动动画（平滑过渡） */
-            will-change: transform; /* 优化动画性能 */
+            display: flex;
+            transition: transform 0.3s ease;
+            will-change: transform;
+            height: 100%; /* 让轨道高度等于容器高度 */
           ">
-            <!-- 2025 照片 - 自动生成 Grid 瀑布流（支持上下滚动） -->
+            <!-- 2025 照片 - 瀑布流（固定高度+滚动） -->
             <div class="grid-waterfall" id="grid2025" style="
               width: 100%;
               flex: 0 0 auto;
-              vertical-align: bottom;
-              overflow-y: auto; /* 允许纵向滚动 */
-              max-height: 80vh; /* 限制最大高度，超出部分滚动 */
-              -webkit-overflow-scrolling: touch; /* 优化移动端滚动体验 */
+              overflow-y: auto;
+              height: 100%; /* 瀑布流占满容器高度，内部滚动 */
+              -webkit-overflow-scrolling: touch;
             ">
               <!-- 图片会由 JS 自动生成在这里 -->
             </div>
 
             <img src="static/about_us/2024.png" alt="2024" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
-              vertical-align: bottom;
+              width: 100%;
+              flex: 0 0 auto;
+              object-fit: contain;
+              height: 100%;
             ">
             <img src="static/about_us/2022.jpg" alt="2022" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
-              vertical-align: bottom;
+              width: 100%;
+              flex: 0 0 auto;
+              object-fit: contain;
+              height: 100%;
             ">
             <img src="static/about_us/2021.jpg" alt="2021" style="
               width: 100%;
               flex: 0 0 auto;
               object-fit: contain;
-              vertical-align: bottom;
+              height: 100%;
             ">
             <img src="static/about_us/group2020.jpg" alt="2020" style="
               width: 100%;
               flex: 0 0 auto;
               object-fit: contain;
-              vertical-align: bottom;
+              height: 100%;
             ">
           </div>
         </div>
 
-        <!-- 可选：左右切换按钮（增强易用性，尤其在移动端） -->
+        <!-- 左右切换按钮（固定位置） -->
         <button class="slide-btn prev-btn" style="
           position: absolute;
           left: 10px;
@@ -328,14 +338,13 @@ header.masthead {
           justify-content: center;
         ">→</button>
 
-        <!-- 可选：图片指示器（显示当前是第几张） -->
+        <!-- 图片指示器 -->
         <div class="slide-indicators" style="
           display: flex;
           justify-content: center;
           gap: 8px;
           margin-top: 10px;
         ">
-          <!-- 新增2025年对应的指示器原点 -->
           <span class="indicator active" style="
             width: 12px;
             height: 12px;
@@ -668,7 +677,7 @@ window.addEventListener('resize', () => {
   updateSlidePosition();
 });
 
-// ========== 2025 瀑布流：带高度更新 ==========
+// ========== 2025 瀑布流：优化高度计算，消除空白 ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
   if (!container) return;
@@ -690,10 +699,9 @@ window.addEventListener('load', function(){
     container.appendChild(item);
   }
 
-  // 图片加载完成后计算高度
-  const baseRow = 10;
+  // 优化图片高度计算，减少空白
+  const baseRow = 5;
   const allImgs = container.querySelectorAll('.grid-item img');
-  let loadedCount = 0;
 
   allImgs.forEach(img => {
     const calcSpan = () => {
@@ -701,12 +709,6 @@ window.addEventListener('load', function(){
       const h = img.offsetHeight;
       const span = Math.ceil(h / baseRow);
       img.parentElement.style.setProperty('--row-span', span);
-      
-      loadedCount++;
-      // 所有图片加载完成后，更新轮播容器高度
-      if (loadedCount === allImgs.length) {
-        slideContainer.style.height = `${container.scrollHeight}px`;
-      }
     };
 
     if (img.complete && img.naturalWidth > 0) {
