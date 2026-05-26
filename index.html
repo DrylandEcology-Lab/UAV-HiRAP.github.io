@@ -19,40 +19,44 @@ header.masthead {
     background-image: url("static/home/index.jpg");
 }
 
-/* ========== 2025 照片专用五列网格布局（无空白，竖排滚动） ========== */
-.grid-five-col {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);  /* 固定五列 */
-  gap: 12px;  /* 图片之间的间距，无多余空白 */
-  padding: 12px;
+/* ========== 无空白瀑布流样式 - 多列布局实现 ========== */
+.grid-waterfall {
+  column-count: 5;    /* 改为 5 列 */
+  column-gap: 12px;
   width: 100%;
+  padding: 6px;
   box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;    /* 竖向滚动 */
+  overflow-x: hidden;  /* 禁止横向滚动 */
 }
 
-/* 响应式：屏幕小于992px时改为3列，小于768px改为2列，小于480px改为1列（保持移动端可用） */
+/* 响应式列数 */
 @media (max-width: 992px) {
-  .grid-five-col {
-    grid-template-columns: repeat(3, 1fr);
+  .grid-waterfall {
+    column-count: 3;
   }
 }
 @media (max-width: 768px) {
-  .grid-five-col {
-    grid-template-columns: repeat(2, 1fr);
+  .grid-waterfall {
+    column-count: 2;
   }
 }
 @media (max-width: 480px) {
-  .grid-five-col {
-    grid-template-columns: 1fr;
+  .grid-waterfall {
+    column-count: 1;
   }
 }
 
 .grid-item {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 12px;  /* 图片之间垂直间距，无额外空白 */
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   transition: transform 0.2s ease;
-  line-height: 0;  /* 彻底消除行高导致的额外空白 */
 }
 
 .grid-item:hover {
@@ -63,7 +67,7 @@ header.masthead {
   width: 100%;
   height: auto;
   display: block;
-  vertical-align: bottom; /* 消除图片底部空白 */
+  vertical-align: bottom; /* 彻底消除图片底部空白 */
 }
 
 /* 固定轮播按钮位置 */
@@ -288,15 +292,15 @@ header.masthead {
             will-change: transform;
             height: 100%;
           ">
-            <!-- 2025 照片 - 五列网格竖排滚动 -->
+            <!-- 2025 照片 - 无空白瀑布流 (多列布局) -->
             <div id="grid2025" style="
               width: 100%;
-              flex: 0 0 auto;
-              overflow-y: auto;
               height: 100%;
+              overflow-y: auto;
+              overflow-x: hidden;
               -webkit-overflow-scrolling: touch;
             ">
-              <!-- 图片由 JS 动态生成，采用五列网格布局 -->
+              <!-- 图片由 JS 动态生成，瀑布流容器类 grid-waterfall 会赋予多列布局 -->
             </div>
 
             <img src="static/about_us/2024.png" alt="2024" style="
@@ -703,19 +707,19 @@ window.addEventListener('resize', () => {
   updateSlidePosition();
 });
 
-// ========== 2025 五列网格布局（竖排滚动，无空白） ==========
+// ========== 2025 瀑布流（多列布局，无空白间隙） ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
   if (!container) return;
 
-  // 应用五列网格样式类
-  container.classList.add('grid-five-col');
+  // 应用瀑布流类
+  container.classList.add('grid-waterfall');
 
   const basePath = 'static/about_us/2025/';
   const fileExt = 'jpg';
   const totalImages = 50;
 
-  // 批量生成图片
+  // 批量生成图片，多列瀑布流自动紧密排列
   for (let i = 1; i <= totalImages; i++) {
     const item = document.createElement('div');
     item.className = 'grid-item';
@@ -723,7 +727,7 @@ window.addEventListener('load', function(){
     const img = document.createElement('img');
     img.src = `${basePath}img${i}.${fileExt}`;
     img.alt = `2025-${i}`;
-    img.loading = 'lazy';
+    img.loading = 'lazy';  // 懒加载优化性能
 
     item.appendChild(img);
     container.appendChild(item);
