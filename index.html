@@ -19,34 +19,36 @@ header.masthead {
     background-image: url("static/home/index.jpg");
 }
 
-/* ========== 瀑布流网格（CSS Grid，支持垂直滚动，完美兼容） ========== */
+/* ========== 瀑布流网格（三列，图片更大，支持垂直滚动） ========== */
 .grid-masonry {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  padding: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;     /* 只允许垂直滚动，避免水平干扰 */
   box-sizing: border-box;
 }
-@media (max-width: 992px) {
-  .grid-masonry { grid-template-columns: repeat(3, 1fr); }
-}
 @media (max-width: 768px) {
-  .grid-masonry { grid-template-columns: repeat(2, 1fr); }
+  .grid-masonry {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 12px;
+  }
 }
 @media (max-width: 480px) {
-  .grid-masonry { grid-template-columns: 1fr; }
+  .grid-masonry {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grid-masonry .grid-item {
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
   line-height: 0;
 }
@@ -438,7 +440,7 @@ header.masthead {
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
 <script>
-// ========== 左右滑动切换年份（不影响垂直滚动） ==========
+// ========== 左右滑动切换年份（完全不影响垂直滚动） ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
 const slides = Array.from(slideTrack.children);
@@ -460,11 +462,9 @@ nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % sl
 prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; updateSlidePosition(); });
 indicators.forEach((indicator, index) => { indicator.addEventListener('click', () => { currentIndex = index; updateSlidePosition(); }); });
 
-// 拖拽切换（仅在水平方向明显时触发，垂直滚动不受影响）
 let isDragging = false;
 let startX, startY;
 let startScrollLeft;
-let isHorizontalDrag = false;
 
 slideContainer.addEventListener('mousedown', startDrag);
 slideContainer.addEventListener('touchstart', startDrag, { passive: false });
@@ -486,7 +486,6 @@ function startDrag(e) {
   }
   const transformVal = getComputedStyle(slideTrack).transform;
   startScrollLeft = transformVal !== 'none' ? parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0 : 0;
-  isHorizontalDrag = false;
 }
 
 function drag(e) {
@@ -501,13 +500,12 @@ function drag(e) {
   }
   const deltaX = Math.abs(currentX - startX);
   const deltaY = Math.abs(currentY - startY);
-  // 如果垂直移动距离更大，不处理水平拖拽（允许原生垂直滚动）
+  // 垂直移动距离更大 → 不处理，让浏览器滚动
   if (deltaY > deltaX) {
-    return; // 让浏览器处理滚动
+    return;
   }
   // 水平拖拽
   if (deltaX > 5) {
-    isHorizontalDrag = true;
     e.preventDefault();
     const dragDistance = currentX - startX;
     slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
@@ -517,14 +515,12 @@ function drag(e) {
 function endDrag() {
   isDragging = false;
   slideContainer.style.cursor = 'grab';
-  if (!isHorizontalDrag) return;
   const transformVal = getComputedStyle(slideTrack).transform;
   const offset = transformVal !== 'none' ? (parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0) : 0;
   let closestIndex = Math.round(-offset / slideWidth);
   closestIndex = Math.max(0, Math.min(closestIndex, slides.length - 1));
   currentIndex = closestIndex;
   updateSlidePosition();
-  isHorizontalDrag = false;
 }
 
 window.addEventListener('resize', () => { updateSlidePosition(); });
