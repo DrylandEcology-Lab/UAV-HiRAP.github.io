@@ -19,14 +19,16 @@ header.masthead {
     background-image: url("static/home/index.jpg");
 }
 
-/* ========== 多列瀑布流样式（修复截断问题） ========== */
+/* ========== 多列瀑布流样式（支持垂直滚动） ========== */
 .grid-waterfall {
   column-count: 5;          /* 默认5列 */
   column-gap: 12px;
   padding: 12px;
   width: 100%;
   height: 100%;             /* 占满父容器高度 */
-  overflow-y: auto;         /* 内部滚动，显示全部内容 */
+  overflow-y: auto;         /* 垂直滚动 */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS平滑滚动 */
   box-sizing: border-box;
 }
 
@@ -49,24 +51,22 @@ header.masthead {
 
 .grid-waterfall .grid-item {
   break-inside: avoid;      /* 防止图片跨列断裂 */
-  margin-bottom: 12px;      /* 图片之间的垂直间距 */
+  margin-bottom: 12px;
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
   box-shadow: 0 2px 5px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
-  line-height: 0;            /* 消除行高导致的空白 */
+  line-height: 0;            /* 消除行高空白 */
 }
-
 .grid-waterfall .grid-item:hover {
   transform: scale(1.02);
 }
-
 .grid-waterfall .grid-item img {
   width: 100%;
   height: auto;
   display: block;
-  vertical-align: bottom;   /* 彻底消除图片底部间隙 */
+  vertical-align: bottom;
 }
 
 /* 固定轮播按钮位置 */
@@ -213,15 +213,13 @@ header.masthead {
     <div class="row">
       <div class="col-md-12" style="margin: 15px 0; position: relative;">
         <div class="text-center" style="background-color:#fed136; border:0; padding: 2px 0;">
-          <p style="color:white; margin: 0; font-size: 14px;">左右滑动查看图片</p>
+          <p style="color:white; margin: 0; font-size: 14px;">← 左右滑动切换年份 → &nbsp;&nbsp;|&nbsp;&nbsp; ↑ 在照片区域上下滑动滚动浏览 ↑</p>
         </div>
         
         <div class="slide-container" style="width:100%; height:600px; overflow:hidden; position:relative; cursor:grab;">
           <div class="slide-track" style="display:flex; transition:transform 0.3s ease; will-change:transform; height:100%;">
-            <!-- 2025 照片容器 - 移除内联高度和溢出，由内部 .grid-waterfall 控制滚动 -->
-            <div id="grid2025" style="width:100%; flex:0 0 auto; height:100%;">
-              <!-- 图片会由 JS 动态生成，并赋予 grid-waterfall 类 -->
-            </div>
+            <!-- 2025 照片容器 -->
+            <div id="grid2025" style="width:100%; flex:0 0 auto; height:100%;"></div>
             <img src="static/about_us/2024.png" alt="2024" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
             <img src="static/about_us/2022.jpg" alt="2022" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
             <img src="static/about_us/2021.jpg" alt="2021" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
@@ -288,7 +286,7 @@ header.masthead {
        </p><p class="h1">
        <h1 style="font-size:20px">2024</h1>
           <li>蔡依霏, 王锋*, 潘绪斌, 张方敏, 任国玉, 卢琦. 2024.中国荒漠化潜在发生区域150年变迁: 过去、现在和未来. 科学通报, 69: 4637-4650. doi: 10.1360/TB-2023-1244.</li>
-          <li>Cai Y*. 2024. Healthy environment in research beneficiaries speak. Science. 384(6691): 27. doi: 10.112 6/science.adp2180.</li>
+          <li>Cai Y*. 2024. Healthy environment in research beneficiaries speak. Science. 384(6691): 27. doi: 10.1126/science.adp2180.</li>
           <li>张宇昕, 杨凯捷, 丛巍巍, 陆森, 张劲松, 王锋*. 2024. 基于SCOPE模型的樟子松人工林日光诱导叶绿素荧光及初级生产力模拟与评估. 陆地生态系统与保护学报, 4(2): 1-13. doi: 10.12356/j.2096-8884.2024-0004.</li>
 
        </p><p class="h1">
@@ -449,7 +447,7 @@ header.masthead {
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
 <script>
-// ========== 轮播逻辑 ==========
+// ========== 轮播逻辑 + 方向检测（允许垂直滚动） ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
 const slides = Array.from(slideTrack.children);
@@ -470,31 +468,67 @@ function updateSlidePosition() {
 nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % slides.length; updateSlidePosition(); });
 prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; updateSlidePosition(); });
 indicators.forEach((indicator, index) => { indicator.addEventListener('click', () => { currentIndex = index; updateSlidePosition(); }); });
-let isDragging = false, startX, startScrollLeft;
+
+let isDragging = false;
+let startX, startY;
+let startScrollLeft;
+let isVerticalSwipe = false;
+
 slideContainer.addEventListener('mousedown', startDrag);
-slideContainer.addEventListener('touchstart', startDrag, { passive: true });
+slideContainer.addEventListener('touchstart', startDrag, { passive: false });
 slideContainer.addEventListener('mousemove', drag);
-slideContainer.addEventListener('touchmove', drag, { passive: true });
+slideContainer.addEventListener('touchmove', drag, { passive: false });
 slideContainer.addEventListener('mouseup', endDrag);
 slideContainer.addEventListener('touchend', endDrag);
 slideContainer.addEventListener('selectstart', e => e.preventDefault());
+
 function startDrag(e) {
   isDragging = true;
   slideContainer.style.cursor = 'grabbing';
-  startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+  if (e.type === 'mousedown') {
+    startX = e.clientX;
+    startY = e.clientY;
+  } else {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }
   const transformVal = getComputedStyle(slideTrack).transform;
   startScrollLeft = transformVal !== 'none' ? parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0 : 0;
+  isVerticalSwipe = false;
 }
+
 function drag(e) {
   if (!isDragging) return;
-  e.preventDefault();
-  const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-  const dragDistance = currentX - startX;
-  slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
+  let currentX, currentY;
+  if (e.type === 'mousemove') {
+    currentX = e.clientX;
+    currentY = e.clientY;
+  } else {
+    currentX = e.touches[0].clientX;
+    currentY = e.touches[0].clientY;
+  }
+  const deltaX = Math.abs(currentX - startX);
+  const deltaY = Math.abs(currentY - startY);
+  // 垂直滑动距离 > 水平滑动距离 → 交给浏览器原生垂直滚动
+  if (deltaY > deltaX && deltaY > 5) {
+    isVerticalSwipe = true;
+    return;
+  }
+  // 水平拖拽
+  if (!isVerticalSwipe && deltaX > 5) {
+    e.preventDefault();
+    const dragDistance = currentX - startX;
+    slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
+  }
 }
+
 function endDrag() {
   isDragging = false;
   slideContainer.style.cursor = 'grab';
+  if (isVerticalSwipe) {
+    isVerticalSwipe = false;
+    return;
+  }
   const transformVal = getComputedStyle(slideTrack).transform;
   const offset = transformVal !== 'none' ? (parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0) : 0;
   let closestIndex = Math.round(-offset / slideWidth);
@@ -502,35 +536,27 @@ function endDrag() {
   currentIndex = closestIndex;
   updateSlidePosition();
 }
+
 window.addEventListener('resize', () => { updateSlidePosition(); });
 
-// ========== 2025 照片生成 - 使用 column-count 多列瀑布流 ==========
+// ========== 生成2025年50张照片（多列瀑布流） ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
   if (!container) return;
-
-  // 应用多列瀑布流样式
   container.classList.add('grid-waterfall');
 
   const basePath = 'static/about_us/2025/';
   const fileExt = 'jpg';
   const totalImages = 50;
 
-  // 批量生成图片
   for (let i = 1; i <= totalImages; i++) {
     const item = document.createElement('div');
     item.className = 'grid-item';
-
     const img = document.createElement('img');
     img.src = `${basePath}img${i}.${fileExt}`;
     img.alt = `2025-${i}`;
     img.loading = 'lazy';
-    
-    // 错误处理
-    img.onerror = function() {
-      console.warn(`图片加载失败: ${img.src}`);
-    };
-
+    img.onerror = function() { console.warn(`图片加载失败: ${img.src}`); };
     item.appendChild(img);
     container.appendChild(item);
   }
