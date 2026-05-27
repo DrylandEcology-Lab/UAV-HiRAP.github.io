@@ -80,6 +80,36 @@ header.masthead {
 .slide-container {
   user-select: none;
 }
+/* 强制修复 2025 照片被压扁/裁剪的问题 */
+#grid2025 {
+  height: 600px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+#grid2025.grid-masonry {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  align-items: start !important;
+}
+
+#grid2025 .grid-item {
+  height: auto !important;
+  overflow: visible !important;
+  line-height: normal !important;
+}
+
+#grid2025 .grid-item img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+  border-radius: 8px;
+}
 </style>
 </head>
 <body>
@@ -560,36 +590,7 @@ window.addEventListener('load', function(){
     container.appendChild(item);
   }
 });
-/* 强制修复 2025 照片被压扁/裁剪的问题 */
-#grid2025 {
-  height: 600px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
 
-#grid2025.grid-masonry {
-  display: grid !important;
-  grid-template-columns: repeat(5, minmax(220px, 1fr)) !important;
-  gap: 16px !important;
-  padding: 16px !important;
-  box-sizing: border-box !important;
-  align-items: start !important;
-}
-
-#grid2025 .grid-item {
-  height: auto !important;
-  overflow: visible !important;
-  line-height: normal !important;
-}
-
-#grid2025 .grid-item img {
-  width: 100% !important;
-  height: auto !important;
-  max-height: none !important;
-  object-fit: contain !important;
-  display: block !important;
-  border-radius: 8px;
-}
 </script>
 </body>
 </html>
