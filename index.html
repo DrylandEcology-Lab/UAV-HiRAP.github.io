@@ -110,6 +110,38 @@ header.masthead {
   display: block !important;
   border-radius: 8px;
 }
+
+/* 新增年份按钮组样式 - 完全不干扰原有图片排列 */
+.year-buttons-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.year-btn {
+  background-color: #e9ecef;
+  border: none;
+  padding: 6px 18px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.year-btn:hover {
+  background-color: #fed136;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.year-btn.active-year {
+  background-color: #fed136;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(254,209,54,0.3);
+}
 </style>
 </head>
 <body>
@@ -264,6 +296,8 @@ header.masthead {
           <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
           <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
         </div>
+        
+        <!-- 年份按钮组将动态添加在此处下方，保证完全不影响原有结构和图片排列方式 -->
       </div>
     </div>
 
@@ -491,6 +525,19 @@ function updateSlidePosition() {
   indicators.forEach((indicator, index) => {
     indicator.style.backgroundColor = index === currentIndex ? '#fed136' : '#ccc';
   });
+  
+  // 同步年份按钮高亮状态 (年份按钮动态添加后生效)
+  const yearBtns = document.querySelectorAll('.year-btn');
+  if (yearBtns.length) {
+    yearBtns.forEach((btn, idx) => {
+      const btnIndex = parseInt(btn.getAttribute('data-index'), 10);
+      if (btnIndex === currentIndex) {
+        btn.classList.add('active-year');
+      } else {
+        btn.classList.remove('active-year');
+      }
+    });
+  }
 }
 nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % slides.length; updateSlidePosition(); });
 prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; updateSlidePosition(); });
@@ -571,26 +618,49 @@ window.addEventListener('resize', () => { updateSlidePosition(); });
 // ========== 生成2025年50张照片（5列自适应，图片不压缩） ==========
 window.addEventListener('load', function(){
   const container = document.getElementById('grid2025');
-  if (!container) return;
-  container.classList.add('grid-masonry');
+  if (container) {
+    container.classList.add('grid-masonry');
+    const basePath = 'static/about_us/2025/';
+    const fileExt = 'jpg';
+    const totalImages = 48;
+    for (let i = 1; i <= totalImages; i++) {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
+      const img = document.createElement('img');
+      img.src = `${basePath}img${i}.${fileExt}`;
+      img.alt = `2025-${i}`;
+      img.loading = 'lazy';
+      img.onerror = function() { console.warn(`图片加载失败: ${img.src}`); };
+      item.appendChild(img);
+      container.appendChild(item);
+    }
+  }
 
-  const basePath = 'static/about_us/2025/';
-  const fileExt = 'jpg';
-  const totalImages = 50;
-
-  for (let i = 1; i <= totalImages; i++) {
-    const item = document.createElement('div');
-    item.className = 'grid-item';
-    const img = document.createElement('img');
-    img.src = `${basePath}img${i}.${fileExt}`;
-    img.alt = `2025-${i}`;
-    img.loading = 'lazy';
-    img.onerror = function() { console.warn(`图片加载失败: ${img.src}`); };
-    item.appendChild(img);
-    container.appendChild(item);
+  // ========== 新增年份按钮组（不改变原有结构和图片排列方式） ==========
+  const indicatorsContainer = document.querySelector('.slide-indicators');
+  if (indicatorsContainer && !document.querySelector('.year-buttons-group')) {
+    const yearBtnWrapper = document.createElement('div');
+    yearBtnWrapper.className = 'year-buttons-group';
+    const years = ['2025', '2024', '2022', '2021', '2020'];
+    years.forEach((year, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = year;
+      btn.classList.add('year-btn');
+      if (idx === currentIndex) btn.classList.add('active-year');
+      btn.setAttribute('data-index', idx);
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = idx;
+        updateSlidePosition();
+      });
+      yearBtnWrapper.appendChild(btn);
+    });
+    // 插入至指示器后方，完全保留原有滑动区域及图片样式
+    indicatorsContainer.parentNode.insertBefore(yearBtnWrapper, indicatorsContainer.nextSibling);
+    // 确保按钮初始高亮与当前索引同步
+    updateSlidePosition();
   }
 });
-
 </script>
 </body>
 </html>
