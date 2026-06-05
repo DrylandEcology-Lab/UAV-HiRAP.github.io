@@ -1,5 +1,5 @@
-﻿<html lang="zh-CN">
-
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,9 +18,132 @@
 header.masthead {
     background-image: url("static/home/index.jpg");
 }
+
+/* ========== 5列自适应网格，最小宽度220px，保证图片不太小 ========== */
+.grid-masonry {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1200px) {
+  .grid-masonry { column-count: 4; }
+}
+@media (max-width: 992px) {
+  .grid-masonry { column-count: 3; }
+}
+@media (max-width: 768px) {
+  .grid-masonry { column-count: 2; }
+}
+@media (max-width: 480px) {
+  .grid-masonry { column-count: 1; }
+}
+
+.grid-masonry .grid-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease;
+  line-height: 0;
+}
+
+.grid-masonry .grid-item:hover {
+  transform: scale(1.02);
+}
+
+.grid-masonry .grid-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 固定轮播按钮位置 */
+.slide-btn {
+  position: absolute;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10;
+}
+.prev-btn { left: 10px !important; }
+.next-btn { right: 10px !important; }
+
+/* 团队滑动区域辅助样式 */
+.slide-container {
+  user-select: none;
+}
+/* 强制修复 2025 照片被压扁/裁剪的问题 */
+#grid2025 {
+  height: 600px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+#grid2025.grid-masonry {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  align-items: start !important;
+}
+
+#grid2025 .grid-item {
+  height: auto !important;
+  overflow: visible !important;
+  line-height: normal !important;
+}
+
+#grid2025 .grid-item img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  display: block !important;
+  border-radius: 8px;
+}
+
+/* 新增年份按钮组样式 - 完全不干扰原有图片排列 */
+.year-buttons-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.year-btn {
+  background-color: #e9ecef;
+  border: none;
+  padding: 6px 18px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.year-btn:hover {
+  background-color: #fed136;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.year-btn.active-year {
+  background-color: #fed136;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(254,209,54,0.3);
+}
 </style>
 </head>
-
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
@@ -32,21 +155,11 @@ header.masthead {
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav text-uppercase ml-auto">
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#services">Services</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#datasets">Datasets</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#news">News</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#team">Team</a>
-        </li>
-                <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#publications">Publications</a>
-        </li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#datasets">Datasets</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#news">News</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#team">Team</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#publications">Publications</a></li>
       </ul>
     </div>
   </div>
@@ -76,10 +189,9 @@ header.masthead {
           <img src="static/home/logo_route.png" alt="route_design" width="150px" height="150px">
           <h4 class="service-heading">Route Design</h4>
         </a>
-        <p class="text-muted">给定样地顶点坐标和无人机飞行参数设置，生成满足拼图要求的最佳航线规划，并支持导出为litchi
-          飞控配置文件。</p>
+        <p class="text-muted">给定样地顶点坐标和无人机飞行参数设置，生成满足拼图要求的最佳航线规划，并支持导出为litchi飞控配置文件。</p>
       </div>
-      <div class="col-md-3" href="https://app.uav-hirap.org/auth/login">
+      <div class="col-md-3">
         <a href="https://app.uav-hirap.org/auth/login">
           <img src="static/home/logo_dtc.png" alt="route_design" width="150px" height="150px">
           <h4 class="service-heading">Image Analysis</h4>
@@ -103,7 +215,6 @@ header.masthead {
     </div>
   </div>
 </section>
-
 
 <section id="datasets">
     <div class="container">
@@ -131,7 +242,6 @@ header.masthead {
 </div>
 </section>
 
-
 <section id="news" class="bg-light">
   <div class="container">
     <div class="row">
@@ -142,6 +252,7 @@ header.masthead {
     <div class="row">
       <div class="col-lg-12">
         <ul class="timeline">
+<<<<<<< HEAD
             <li>
               <div class="timeline-image">
                 <!-- the picture is not match with the content-->
@@ -193,6 +304,12 @@ header.masthead {
             </div>
             </a>
           </li>
+=======
+            <li><div class="timeline-image"><img class="rounded-circle img-fluid" src="static/news/20260520.jpg" alt="publish" style="height:100%!important;"></div><div class="timeline-panel"><div class="timeline-heading"><h4>2026.5</h4><h4 class="subheading">课题组赴内蒙扎鲁特旗开展退化草原修复技术应用示范</h4></div><div class="timeline-body"><p class="text-muted">2026年5月19-20日，依托国家重点研发计划《科尔沁典型草原近自然修复和生态质量综合提升技术研发与示范》课题，中国林科院生态保护与修复研究所组织内蒙古农业大学、蒙草科技有限公司赴内蒙古扎鲁特旗，针对科尔沁退化草原、沙化草原、盐渍化草原开展近自然修复技术研发与应用示范工作。本次野外工作由生态所王锋研究员、姚斌研究员、张金鑫研究员、朱金雷副研究员、博士生蔡依霏、硕士生夏双双，以及内蒙古农业大学段涛教授、侯东杰副教授，蒙草种业科技研究院张健老师等专家和研究生共同参与。团队深入典型退化草原地块、沙化草地、盐碱地治理区和补播示范点，实地查看草原退化、沙化、盐碱化情况，围绕乡土草种补播、沙障设置、差异化修复模式等开展现场研讨和技术优化。本次工作进一步推进了科尔沁草原近自然修复技术落地示范，为科尔沁草原生态综合治理与北方草原生态保护修复提供科技支撑。</p></div></div></li>
+            <li class="timeline-inverted"><div class="timeline-image"><img class="rounded-circle img-fluid" src="static/news/20260516.jpg" alt="publish" style="height:100%!important;"></div><div class="timeline-panel"><div class="timeline-heading"><h4>2026.5</h4><h4 class="subheading">课题组赴乌海市开展四合木保护与矿区生态修复调研</h4></div><div class="timeline-body"><p class="text-muted">2026年5月16-18日，课题组成员王锋研究员、博士生蔡依霏赴内蒙古乌海市开展实地调研。调研期间，团队通过座谈交流、现场踏勘等方式，了解乌海市四合木资源保护及矿区生态修复相关情况，并与乌海市自然资源局相关负责人就后续研究方向进行了交流。此次调研为课题组进一步掌握区域生态保护与修复工作实际、推进后续研究奠定了基础。</p></div></div></li>
+            <li><div class="timeline-image"><img class="rounded-circle img-fluid" src="static/news/20260511.jpg" alt="publish" style="height:100%!important;"></div><div class="timeline-panel"><div class="timeline-heading"><h4>2026.5</h4><h4 class="subheading">课题组赴甘肃敦煌荒漠生态站完成SIF仪器安装并开展学习调研</h4></div><div class="timeline-body"><p class="text-muted">2026年5月11-15日，课题组博士后庄杰、博士生刘莹子前往甘肃敦煌荒漠生态系统国家定位观测研究站开展SIF仪器的安装工作，实地考察并学习了该研究站各分站点的仪器布设方案以及各站点的自然植被类型。南京艾格赛弗工程师王帅涛为本次仪器安装提供了技术支持。</p></div></div></li>
+            <li class="timeline-inverted"><a href="news.html" target="_blank"><div class="timeline-image"><h4>•<br>•<br>•</h4></div></a></li>
+>>>>>>> 2004c120237fd14c0c3c817942b43178ccef17e2
         </ul>
       </div>
     </div>
@@ -207,261 +324,36 @@ header.masthead {
       </div>
     </div>
     <div class="row">
-
-      <!-- 新增：图片滑动窗口 -->
       <div class="col-md-12" style="margin: 15px 0; position: relative;">
-        <!-- 滑动指示器（可选，提示用户可滑动） -->
         <div class="text-center" style="background-color:#fed136; border:0; padding: 2px 0;">
-          <p style="color:white; margin: 0; font-size: 14px;">左右滑动查看图片</p>
+          <p style="color:white; margin: 0; font-size: 14px;">← 左右滑动切换年份 → &nbsp;&nbsp;|&nbsp;&nbsp; ↑ 在照片区域上下滑动滚动浏览 ↑</p>
         </div>
         
-        <!-- 滑动容器：限制可视区域 -->
-        <div class="slide-container" style="
-          width: 100%; 
-          overflow: hidden; /* 隐藏超出可视区域的图片 */
-          position: relative;
-          cursor: grab; /* 鼠标悬浮时显示“可抓取”图标 */
-        ">
-          <!-- 图片轨道：所有图片横向排列 -->
-          <div class="slide-track" style="
-            display: flex; /* 图片横向排列 */
-            transition: transform 0.3s ease; /* 滑动动画（平滑过渡） */
-            will-change: transform; /* 优化动画性能 */
-          ">
-            <!-- 新增2025年照片 -->
-            <img src="static/about_us/2025.png" alt="2025" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
-              vertical-align: bottom;
-            ">
-            <img src="static/about_us/2024.png" alt="2024" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
-              vertical-align: bottom;
-            ">
-            <img src="static/about_us/2022.jpg" alt="2022" style="
-              width: 100%; /* 每张图片占满容器宽度 */
-              flex: 0 0 auto; /* 禁止图片缩放 */
-              object-fit: contain; /* 保持图片比例，避免拉伸 */
-              vertical-align: bottom;
-            ">
-            <img src="static/about_us/2021.jpg" alt="2021" style="
-              width: 100%;
-              flex: 0 0 auto;
-              object-fit: contain;
-              vertical-align: bottom;
-            ">
-            <img src="static/about_us/group2020.jpg" alt="2020" style="
-              width: 100%;
-              flex: 0 0 auto;
-              object-fit: contain;
-              vertical-align: bottom;
-            ">
+        <div class="slide-container" style="width:100%; height:600px; overflow:hidden; position:relative; cursor:grab;">
+          <div class="slide-track" style="display:flex; transition:transform 0.3s ease; will-change:transform; height:100%;">
+            <!-- 2025 照片容器 -->
+            <div id="grid2025" style="width:100%; flex:0 0 auto; height:100%; overflow-y:auto;"></div>
+            <img src="static/about_us/2024.png" alt="2024" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
+            <img src="static/about_us/2022.jpg" alt="2022" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
+            <img src="static/about_us/2021.jpg" alt="2021" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
+            <img src="static/about_us/group2020.jpg" alt="2020" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
           </div>
         </div>
 
-        <!-- 可选：左右切换按钮（增强易用性，尤其在移动端） -->
-        <button class="slide-btn prev-btn" style="
-          position: absolute;
-          left: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          background-color: rgba(0,0,0,0.5);
-          color: white;
-          border: none;
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          font-size: 18px;
-          cursor: pointer;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        ">←</button>
-        <button class="slide-btn next-btn" style="
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          background-color: rgba(0,0,0,0.5);
-          color: white;
-          border: none;
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          font-size: 18px;
-          cursor: pointer;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        ">→</button>
+        <button class="slide-btn prev-btn" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background-color:rgba(0,0,0,0.5); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:18px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center;">←</button>
+        <button class="slide-btn next-btn" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background-color:rgba(0,0,0,0.5); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:18px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center;">→</button>
 
-        <!-- 可选：图片指示器（显示当前是第几张） -->
-        <div class="slide-indicators" style="
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          margin-top: 10px;
-        ">
-          <!-- 新增2025年对应的指示器原点 -->
-          <span class="indicator active" style="
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #fed136;
-            cursor: pointer;
-          "></span>
-          <span class="indicator" style="
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ccc;
-            cursor: pointer;
-          "></span>
-          <span class="indicator" style="
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ccc;
-            cursor: pointer;
-          "></span>
-          <span class="indicator" style="
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ccc;
-            cursor: pointer;
-          "></span>
-          <span class="indicator" style="
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ccc;
-            cursor: pointer;
-          "></span>
+        <div class="slide-indicators" style="display:flex; justify-content:center; gap:8px; margin-top:10px;">
+          <span class="indicator active" style="width:12px; height:12px; border-radius:50%; background-color:#fed136; cursor:pointer;"></span>
+          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
         </div>
+        
+        <!-- 年份按钮组将动态添加在此处下方，保证完全不影响原有结构和图片排列方式 -->
       </div>
     </div>
-
-    <!-- 把JS代码放在这里（你指定的位置：文本前面、</section>之前） -->
-    <script>
-    // 核心元素获取
-    const slideTrack = document.querySelector('.slide-track');
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const indicators = document.querySelectorAll('.indicator');
-    const images = slideTrack.querySelectorAll('img');
-    let currentIndex = 0; // 默认显示第一张（2025年照片）
-
-    // 更新指示器样式
-    function updateIndicators() {
-      indicators.forEach((ind, index) => {
-        if (index === currentIndex) {
-          ind.style.backgroundColor = '#fed136';
-          ind.classList.add('active');
-        } else {
-          ind.style.backgroundColor = '#ccc';
-          ind.classList.remove('active');
-        }
-      });
-    }
-
-    // 切换到指定索引的图片
-    function goToSlide(index) {
-      // 边界处理：循环切换
-      if (index < 0) index = images.length - 1;
-      if (index >= images.length) index = 0;
-      
-      currentIndex = index;
-      // 计算偏移量，实现滑动效果
-      slideTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-      // 更新指示器状态
-      updateIndicators();
-    }
-
-    // 下一张按钮点击事件
-    nextBtn.addEventListener('click', () => {
-      goToSlide(currentIndex + 1);
-    });
-
-    // 上一张按钮点击事件
-    prevBtn.addEventListener('click', () => {
-      goToSlide(currentIndex - 1);
-    });
-
-    // 指示器点击跳转
-    indicators.forEach((ind, index) => {
-      ind.addEventListener('click', () => {
-        goToSlide(index);
-      });
-    });
-
-    // 鼠标拖拽滑动功能
-    let isDragging = false;
-    let startX;
-    let startTransform = 0;
-
-    // 鼠标按下开始拖拽
-    slideTrack.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      // 获取当前的transform偏移值
-      const currentTransform = getComputedStyle(slideTrack).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
-      slideTrack.style.cursor = 'grabbing';
-      slideTrack.style.transition = 'none'; // 暂停过渡，拖拽更流畅
-    });
-
-    // 鼠标移动时拖拽
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const moveX = e.clientX - startX;
-      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
-    });
-
-    // 鼠标松开结束拖拽
-    document.addEventListener('mouseup', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      slideTrack.style.cursor = 'grab';
-      slideTrack.style.transition = 'transform 0.3s ease'; // 恢复过渡动画
-      
-      // 自动吸附到最近的图片
-      const slideWidth = slideTrack.offsetWidth;
-      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
-      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
-      goToSlide(closestIndex);
-    });
-
-    // 移动端触摸滑动适配
-    slideTrack.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      const currentTransform = getComputedStyle(slideTrack).transform;
-      startTransform = currentTransform === 'none' ? 0 : parseFloat(currentTransform.split(',')[4]) || 0;
-      slideTrack.style.transition = 'none';
-    });
-
-    document.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const moveX = e.touches[0].clientX - startX;
-      slideTrack.style.transform = `translateX(${startTransform + moveX}px)`;
-    });
-
-    document.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      slideTrack.style.transition = 'transform 0.3s ease';
-      const slideWidth = slideTrack.offsetWidth;
-      const currentOffset = parseFloat(getComputedStyle(slideTrack).transform.split(',')[4]) || 0;
-      const closestIndex = Math.round(Math.abs(currentOffset) / slideWidth);
-      goToSlide(closestIndex);
-    });
-    </script>
 
     <div class="row">
       <div class="col-lg-8 mx-auto text-center">
@@ -490,7 +382,6 @@ header.masthead {
       </div>
     </div>
 
-
       <div class="col-lg-12">
         <h3>Papers</h3>
         <ol>
@@ -510,7 +401,7 @@ header.masthead {
        </p><p class="h1">
        <h1 style="font-size:20px">2024</h1>
           <li>蔡依霏, 王锋*, 潘绪斌, 张方敏, 任国玉, 卢琦. 2024.中国荒漠化潜在发生区域150年变迁: 过去、现在和未来. 科学通报, 69: 4637-4650. doi: 10.1360/TB-2023-1244.</li>
-          <li>Cai Y*. 2024. Healthy environment in research beneficiaries speak. Science. 384(6691): 27. doi: 10.112 6/science.adp2180.</li>
+          <li>Cai Y*. 2024. Healthy environment in research beneficiaries speak. Science. 384(6691): 27. doi: 10.1126/science.adp2180.</li>
           <li>张宇昕, 杨凯捷, 丛巍巍, 陆森, 张劲松, 王锋*. 2024. 基于SCOPE模型的樟子松人工林日光诱导叶绿素荧光及初级生产力模拟与评估. 陆地生态系统与保护学报, 4(2): 1-13. doi: 10.12356/j.2096-8884.2024-0004.</li>
 
        </p><p class="h1">
@@ -541,7 +432,7 @@ header.masthead {
           <li>王锋*, 卢琦. 2019. 沙地樟子松散生单木的天然更新幼苗空间分布模型. 林业科学, 55(8): 1-8.doi:10.11707/j.1001-7488.20190801.</li>
           <li>姚雪玲, 姜丽娜, 李龙, 王锋, 吴波, 郭秀江. 2019. 浑善达克沙地6种灌木生物量模拟. 生态学报, 39(3)：905-912.doi: 10.5846/stxb201803290637.</li>
           <li>吴隐, 韩东, 姚雪玲, 张静, 王锋*. 2019. 基于无人机高分辨率航空影像的榆树疏林空间分布格局及其地形效应. 热带地理, 39(4)：531-537.doi:10.13284/j.cnki.rddl.003152.</li>
-          <li>Wu R, Cong W, Li Y, Li S, Wang D, Jia Z*, Wang F*. 2019. The Scientific Conceptual Framework for Ecological Quality of the Dryland Ecosystem: Concepts, Indicators, Monitoring and Assessment. Journal of Resources and Ecology, 10(2): 196-201.doi:10.5814/j.issn.1674-764x.2019.02.010.</li> 
+          <li>Wu R, Cong W, Li Y, Li S, Wang D, Jia Z*, Wang F*. 2019. The Scientific Conceptual Framework for Ecological Quality of the Dryland Ecosystem: Concepts, Indicators, Monitoring and Assessment. Journal of Resources and Ecology, 10(2): 196-201.doi:10.5814/j.issn.1674-764x.201902.010.</li> 
           <li>Wang S, Wang J, Zhang L, Xiao Z, Wang F, Sun N, Li D, Chen B, Chen J, Li Y, Wang X, Wang M. 2019. A National Key R&D Program: Technologies and and Guidelines for Monitoring Ecological Quality of terrestrial ecosystems in China. Journal of Resources and Ecology, 10(2): 105-111.doi:10.5814/j.issn.1674-764x.2019.02.001.</li>
        </p><p class="h1">
         <h1 style="font-size:20px">2018 2017</h1>
@@ -578,8 +469,8 @@ header.masthead {
           <li>李晓雅. 从分布格局到单木结构:中国东部温带稀树草原的结构特征研究. 第十六届中国林业青年学术年会. 中国武汉. 2024年11月15日-17日.</li>
           <li>蔡依霏. 中国“三北”地区荒漠化潜在地理分布研究. 第十六届中国林业青年学术年会. 中国武汉. 2024年11月15日-17日.</li>
           <li>王锋. 中国东部沙地温带稀树草原：定位监测、区域分布及经验启示.  内蒙古自治区林业科学研究院举办建院70周年暨三北地区生态保护与防沙治沙学术研讨会. 中国呼和浩特. 2024年11月8日-10日.</li>
-          <li>王锋. 科尔沁、浑善达克沙地稀树草原分布与成因研究. 第二十三届生态学大会. 中国沈阳. 2024年10月25日-27日.</li>
-          <li>夏双双. 基于无人机遥感的榆树疏林草原十年植被覆盖时空动态. 第二十三届生态学大会. 中国沈阳. 2024年10月25日-27日.</li>
+          <li>王锋. 科尔沁、浑善达克沙地稀树草原分布与成因研究. 第二十三届生态学大会. 中国沈阳. 2024年10月25-27日.</li>
+          <li>夏双双. 基于无人机遥感的榆树疏林草原十年植被覆盖时空动态. 第二十三届生态学大会. 中国沈阳. 2024年10月25-27日.</li>
           <li>王锋. 黄河流域水资源承载力下林草资源优化配置研究. 第五届国际三角洲论坛暨第二届黄河国际人才周活动. 中国东营. 2024年9月25-27日.</li>
           <li>王锋. 破解中国东部沙地温带稀树草原的分布与成因. 第九届青年地学论坛.中国厦门. 2024年5月18-20日.</li>
           <li>李晓雅. 基于深度学习算法和高分卫星的中国东部沙地温带稀树草原单木识别研究. 第九届青年地学论坛. 中国厦门. 2024年5月18-20日.</li>
@@ -659,138 +550,171 @@ header.masthead {
 <footer>
   <div class="container">
     <div class="row">
-      <div class="col-md-4">
-        <span class="copyright">Copyright © CAF-IDS 2018</span>
-      </div>
-      <div class="col-md-4">
-        <span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a></span>
-      </div>
-      <div class="col-md-4">
-        <span class="copyright"><a href="#" class="js-scroll-trigger">Back to top</a></span>
-      </div>
+      <div class="col-md-4"><span class="copyright">Copyright © CAF-IDS 2018</span></div>
+      <div class="col-md-4"><span class="copyright">Powered by <a href="https://getbootstrap.com">Bootstrap4</a></span></div>
+      <div class="col-md-4"><span class="copyright"><a href="#" class="js-scroll-trigger">Back to top</a></span></div>
     </div>
   </div>
 </footer>
-
 
 <script src="static/home/vendor/jquery/jquery.min.js"></script>
 <script src="static/home/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="static/home/vendor/jquery-easing/jquery.easing.min.js"></script>
 <script src="static/home/home.js"></script>
 <script>
-// 1. 获取DOM元素
+// ========== 左右滑动切换年份（不影响垂直滚动） ==========
 const slideContainer = document.querySelector('.slide-container');
 const slideTrack = document.querySelector('.slide-track');
-const slides = slideTrack.querySelectorAll('img'); // 所有图片
+const slides = Array.from(slideTrack.children);
 const prevBtn = document.querySelector('.prev-btn');
 const nextBtn = document.querySelector('.next-btn');
 const indicators = document.querySelectorAll('.indicator');
+let currentIndex = 0;
+let slideWidth = slideContainer.offsetWidth;
 
-// 2. 初始化参数
-let currentIndex = 0; // 当前显示的图片索引（0=2021，1=2022，2=2024）
-const slideWidth = slideContainer.offsetWidth; // 每张图片的宽度（等于容器宽度）
-
-// 3. 核心函数：更新滑动位置（根据当前索引）
 function updateSlidePosition() {
-  // 计算轨道需要偏移的距离（负方向=向左滑动）
+  slideWidth = slideContainer.offsetWidth;
   const offset = -currentIndex * slideWidth;
   slideTrack.style.transform = `translateX(${offset}px)`;
-  
-  // 更新指示器状态（当前图片对应指示器高亮）
   indicators.forEach((indicator, index) => {
-    if (index === currentIndex) {
-      indicator.style.backgroundColor = '#fed136'; // 高亮色（与页面主题色一致）
-    } else {
-      indicator.style.backgroundColor = '#ccc'; // 默认灰色
-    }
+    indicator.style.backgroundColor = index === currentIndex ? '#fed136' : '#ccc';
   });
+  
+  // 同步年份按钮高亮状态 (年份按钮动态添加后生效)
+  const yearBtns = document.querySelectorAll('.year-btn');
+  if (yearBtns.length) {
+    yearBtns.forEach((btn, idx) => {
+      const btnIndex = parseInt(btn.getAttribute('data-index'), 10);
+      if (btnIndex === currentIndex) {
+        btn.classList.add('active-year');
+      } else {
+        btn.classList.remove('active-year');
+      }
+    });
+  }
 }
+nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % slides.length; updateSlidePosition(); });
+prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; updateSlidePosition(); });
+indicators.forEach((indicator, index) => { indicator.addEventListener('click', () => { currentIndex = index; updateSlidePosition(); }); });
 
-// 4. 点击“下一张”按钮
-nextBtn.addEventListener('click', () => {
-  // 边界判断：最后一张图点击后回到第一张
-  currentIndex = (currentIndex + 1) % slides.length;
-  updateSlidePosition();
-});
+let isDragging = false;
+let startX, startY;
+let startScrollLeft;
+let isHorizontalDrag = false;
 
-// 5. 点击“上一张”按钮
-prevBtn.addEventListener('click', () => {
-  // 边界判断：第一张图点击后回到最后一张
-  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-  updateSlidePosition();
-});
-
-// 6. 点击指示器切换图片
-indicators.forEach((indicator, index) => {
-  indicator.addEventListener('click', () => {
-    currentIndex = index;
-    updateSlidePosition();
-  });
-});
-
-// 7. 手动拖拽滑动功能（核心交互）
-let isDragging = false; // 是否正在拖拽
-let startX; // 拖拽起始位置的X坐标
-let startScrollLeft; // 拖拽起始时轨道的偏移量
-
-// 拖拽开始：鼠标按下/触摸开始
 slideContainer.addEventListener('mousedown', startDrag);
-slideContainer.addEventListener('touchstart', startDrag, { passive: true }); // passive优化触摸性能
-
-// 拖拽中：鼠标移动/触摸移动
+slideContainer.addEventListener('touchstart', startDrag, { passive: false });
 slideContainer.addEventListener('mousemove', drag);
-slideContainer.addEventListener('touchmove', drag, { passive: true });
-
-// 拖拽结束：鼠标松开/触摸结束
+slideContainer.addEventListener('touchmove', drag, { passive: false });
 slideContainer.addEventListener('mouseup', endDrag);
 slideContainer.addEventListener('touchend', endDrag);
+slideContainer.addEventListener('selectstart', e => e.preventDefault());
 
-// 防止拖拽时选中文字（优化体验）
-slideContainer.addEventListener('selectstart', (e) => e.preventDefault());
-
-// 拖拽开始函数
 function startDrag(e) {
   isDragging = true;
-  slideContainer.style.cursor = 'grabbing'; // 拖拽时鼠标显示“抓取中”
-  // 获取起始位置（兼容鼠标和触摸）
-  startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-  // 获取轨道当前的偏移量（从transform样式中解析）
-  startScrollLeft = parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) || 0;
+  slideContainer.style.cursor = 'grabbing';
+  if (e.type === 'mousedown') {
+    startX = e.clientX;
+    startY = e.clientY;
+  } else {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }
+  const transformVal = getComputedStyle(slideTrack).transform;
+  startScrollLeft = transformVal !== 'none' ? parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0 : 0;
+  isHorizontalDrag = false;
 }
 
-// 拖拽中函数
 function drag(e) {
-  if (!isDragging) return; // 未拖拽时不执行
-  e.preventDefault(); // 防止页面滚动
-  // 获取当前位置
-  const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-  // 计算拖拽的距离（当前位置 - 起始位置）
-  const dragDistance = currentX - startX;
-  // 更新轨道位置（起始偏移量 + 拖拽距离）
-  slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
+  if (!isDragging) return;
+
+  let currentX, currentY;
+
+  if (e.type === 'mousemove') {
+    currentX = e.clientX;
+    currentY = e.clientY;
+  } else {
+    currentX = e.touches[0].clientX;
+    currentY = e.touches[0].clientY;
+  }
+
+  const deltaX = Math.abs(currentX - startX);
+  const deltaY = Math.abs(currentY - startY);
+
+  if (e.target.closest('.grid-masonry') && deltaY > deltaX) {
+    return;
+  }
+
+  if (deltaX > deltaY && deltaX > 8) {
+    isHorizontalDrag = true;
+    e.preventDefault();
+
+    const dragDistance = currentX - startX;
+    slideTrack.style.transform = `translateX(${startScrollLeft + dragDistance}px)`;
+  }
 }
 
-// 拖拽结束函数
 function endDrag() {
   isDragging = false;
-  slideContainer.style.cursor = 'grab'; // 结束拖拽后恢复鼠标样式
-  // 计算“应该切换到哪张图”：根据轨道偏移量判断
-  const closestIndex = Math.round(-parseInt(getComputedStyle(slideTrack).transform.match(/(-?\d+)/)[0]) / slideWidth);
-  // 限制索引在有效范围内（0 ~ 图片数量-1）
-  currentIndex = Math.max(0, Math.min(closestIndex, slides.length - 1));
-  // 平滑切换到目标图片
+  slideContainer.style.cursor = 'grab';
+  if (!isHorizontalDrag) return;
+  const transformVal = getComputedStyle(slideTrack).transform;
+  const offset = transformVal !== 'none' ? (parseInt(transformVal.match(/(-?\d+)/)?.[0]) || 0) : 0;
+  let closestIndex = Math.round(-offset / slideWidth);
+  closestIndex = Math.max(0, Math.min(closestIndex, slides.length - 1));
+  currentIndex = closestIndex;
   updateSlidePosition();
+  isHorizontalDrag = false;
 }
 
-// 窗口大小改变时，重新计算图片宽度（避免响应式问题）
-window.addEventListener('resize', () => {
-  const newSlideWidth = slideContainer.offsetWidth;
-  if (newSlideWidth !== slideWidth) {
-    // 更新宽度后，重新定位当前图片
+window.addEventListener('resize', () => { updateSlidePosition(); });
+
+// ========== 生成2025年50张照片（5列自适应，图片不压缩） ==========
+window.addEventListener('load', function(){
+  const container = document.getElementById('grid2025');
+  if (container) {
+    container.classList.add('grid-masonry');
+    const basePath = 'static/about_us/2025/';
+    const fileExt = 'jpg';
+    const totalImages = 48;
+    for (let i = 1; i <= totalImages; i++) {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
+      const img = document.createElement('img');
+      img.src = `${basePath}img${i}.${fileExt}`;
+      img.alt = `2025-${i}`;
+      img.loading = 'lazy';
+      img.onerror = function() { console.warn(`图片加载失败: ${img.src}`); };
+      item.appendChild(img);
+      container.appendChild(item);
+    }
+  }
+
+  // ========== 新增年份按钮组（不改变原有结构和图片排列方式） ==========
+  const indicatorsContainer = document.querySelector('.slide-indicators');
+  if (indicatorsContainer && !document.querySelector('.year-buttons-group')) {
+    const yearBtnWrapper = document.createElement('div');
+    yearBtnWrapper.className = 'year-buttons-group';
+    const years = ['2025', '2024', '2022', '2021', '2020'];
+    years.forEach((year, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = year;
+      btn.classList.add('year-btn');
+      if (idx === currentIndex) btn.classList.add('active-year');
+      btn.setAttribute('data-index', idx);
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = idx;
+        updateSlidePosition();
+      });
+      yearBtnWrapper.appendChild(btn);
+    });
+    // 插入至指示器后方，完全保留原有滑动区域及图片样式
+    indicatorsContainer.parentNode.insertBefore(yearBtnWrapper, indicatorsContainer.nextSibling);
+    // 确保按钮初始高亮与当前索引同步
     updateSlidePosition();
   }
 });
 </script>
 </body>
-
 </html>
