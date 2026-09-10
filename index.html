@@ -81,13 +81,16 @@ header.masthead {
   user-select: none;
 }
 /* 强制修复 2025 照片被压扁/裁剪的问题 */
-#grid2025 {
+/* 2025和2026照片墙共用样式 */
+#grid2025,
+#grid2026 {
   height: 600px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
 }
 
-#grid2025.grid-masonry {
+#grid2025.grid-masonry,
+#grid2026.grid-masonry {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(220px, 1fr)) !important;
   gap: 16px !important;
@@ -96,13 +99,15 @@ header.masthead {
   align-items: start !important;
 }
 
-#grid2025 .grid-item {
+#grid2025 .grid-item,
+#grid2026 .grid-item {
   height: auto !important;
   overflow: visible !important;
   line-height: normal !important;
 }
 
-#grid2025 .grid-item img {
+#grid2025 .grid-item img,
+#grid2026 .grid-item img {
   width: 100% !important;
   height: auto !important;
   max-height: none !important;
@@ -331,6 +336,8 @@ header.masthead {
         
         <div class="slide-container" style="width:100%; height:600px; overflow:hidden; position:relative; cursor:grab;">
           <div class="slide-track" style="display:flex; transition:transform 0.3s ease; will-change:transform; height:100%;">
+            <!-- 2026 照片容器 -->
+            <div id="grid2026" style="width:100%; flex:0 0 auto; height:100%; overflow-y:auto;"></div>
             <!-- 2025 照片容器 -->
             <div id="grid2025" style="width:100%; flex:0 0 auto; height:100%; overflow-y:auto;"></div>
             <img src="static/about_us/2024.png" alt="2024" style="width:100%; flex:0 0 auto; object-fit:contain; height:100%;">
@@ -344,11 +351,12 @@ header.masthead {
         <button class="slide-btn next-btn" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background-color:rgba(0,0,0,0.5); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:18px; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center;">→</button>
 
         <div class="slide-indicators" style="display:flex; justify-content:center; gap:8px; margin-top:10px;">
-          <span class="indicator active" style="width:12px; height:12px; border-radius:50%; background-color:#fed136; cursor:pointer;"></span>
-          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
-          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
-          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
-          <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+            <span class="indicator active" style="width:12px; height:12px; border-radius:50%; background-color:#fed136; cursor:pointer;"></span>
+            <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+            <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+            <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+            <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
+            <span class="indicator" style="width:12px; height:12px; border-radius:50%; background-color:#ccc; cursor:pointer;"></span>
         </div>
         
         <!-- 年份按钮组将动态添加在此处下方，保证完全不影响原有结构和图片排列方式 -->
@@ -671,8 +679,39 @@ function endDrag() {
 window.addEventListener('resize', () => { updateSlidePosition(); });
 
 // ========== 生成2025年50张照片（5列自适应，图片不压缩） ==========
-window.addEventListener('load', function(){
-  const container = document.getElementById('grid2025');
+    window.addEventListener('load', function () {
+
+        // 加载2026年的照片
+        const container2026 = document.getElementById('grid2026');
+
+        if (container2026) {
+            container2026.classList.add('grid-masonry');
+
+            const basePath2026 = 'static/about_us/2026/';
+            const fileExt2026 = 'jpg';
+
+            // 请把30改成2026文件夹中的实际照片数量
+            const totalImages2026 = 63;
+
+            for (let i = 1; i <= totalImages2026; i++) {
+                const item = document.createElement('div');
+                item.className = 'grid-item';
+
+                const img = document.createElement('img');
+                img.src = `${basePath2026}img${i}.${fileExt2026}`;
+                img.alt = `2026-${i}`;
+                img.loading = 'lazy';
+                img.onerror = function () {
+                    console.warn(`图片加载失败: ${img.src}`);
+                };
+
+                item.appendChild(img);
+                container2026.appendChild(item);
+            }
+        }
+
+        // 继续加载2025年的照片
+        const container = document.getElementById('grid2025');
   if (container) {
     container.classList.add('grid-masonry');
     const basePath = 'static/about_us/2025/';
@@ -696,7 +735,7 @@ window.addEventListener('load', function(){
   if (indicatorsContainer && !document.querySelector('.year-buttons-group')) {
     const yearBtnWrapper = document.createElement('div');
     yearBtnWrapper.className = 'year-buttons-group';
-    const years = ['2025', '2024', '2022', '2021', '2020'];
+    const years = ['2026','2025', '2024', '2022', '2021', '2020'];
     years.forEach((year, idx) => {
       const btn = document.createElement('button');
       btn.textContent = year;
